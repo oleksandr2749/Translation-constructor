@@ -1,3 +1,6 @@
+from UI import App
+import os
+
 def get_data_from_file(path):
     try:
         with open(path, "r", encoding="utf-8") as file:
@@ -7,6 +10,8 @@ def get_data_from_file(path):
         print("Файл не знайдено")
         return None
 
+def crate_directory():
+    pass
 
 def get_comment(line):
     comment = "<!--" + line + "-->"
@@ -74,4 +79,46 @@ def run():
     write_to_file(input_path_to_translation_file, filtered_data)
 
 
-run()
+def get_path_to_about_xml(list_path):
+    path_to_about_xml = []
+    for i in list_path:
+        path_to_about_xml = "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\" + i + "\\About\\About.xml"
+    return path_to_about_xml
+
+
+def get_list_path(path_to_mods_folder):
+    list_path = list()
+    with os.scandir(path_to_mods_folder) as entries:
+        for entry in entries:
+            list_path.append(entry.name)
+    return list_path
+
+
+def get_mod_names():
+    path_to_mods_folder = "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100"
+    # test2 = str()
+    mod_names = list()
+
+    for i in range(109):
+        try:
+            with open(get_path_to_about_xml(get_list_path(path_to_mods_folder)), "r", encoding="utf-8") as file:
+                test = file.readlines()
+        except FileNotFoundError:
+            print("Помилка обробки шляху моду")
+            return None
+        for a in test:
+            if "<name>" in a:
+                test2 = a
+                test3 = test2.replace("<name>", "")
+                test4 = test3.replace("</name>", "")
+                test5 = test4.strip()
+                mod_names.append(test5)
+    return mod_names
+
+# modNames = ["Мод 1", "Мод 2", "Мод 3"]
+
+
+# об'єкт класу, вікно програми
+App(title="Конструктор перекладу", size=(800, 600), mod_names=get_mod_names())
+
+# run()

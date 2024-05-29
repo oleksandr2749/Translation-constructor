@@ -1,7 +1,8 @@
 from UI import App
 import os
 
-def get_data_from_file(path):
+
+def get_data_from_file(path: str):
     try:
         with open(path, "r", encoding="utf-8") as file:
             content = file.readlines()
@@ -10,21 +11,19 @@ def get_data_from_file(path):
         print("Файл не знайдено")
         return None
 
-def crate_directory():
-    pass
 
-def get_comment(line):
+def get_comment(line: str):
     comment = "<!--" + line + "-->"
     return comment
 
 
-def get_def_name(def_line):
+def get_def_name(def_line: str):
     stage1 = def_line.replace("<defName>", "")
     stage2 = stage1.replace("</defName>", "")
     return stage2
 
 
-def get_label(def_name, label_line):
+def get_label(def_name: str, label_line: str):
     stage1 = label_line.replace("<label>", "")
     stage2 = stage1.replace("</label>", "")
     comment = get_comment(line=stage2)
@@ -32,7 +31,7 @@ def get_label(def_name, label_line):
     return label
 
 
-def get_description(def_name, description_line):
+def get_description(def_name: str, description_line: str):
     stage1 = description_line.replace("<description>", "")
     stage2 = stage1.replace("</description>", "")
     comment = get_comment(line=stage2)
@@ -59,7 +58,7 @@ def data_filter(obtained_data):
     return data
 
 
-def write_to_file(path, data):
+def write_to_file(path: str, data: list):
     try:
         with open(path, "w+", encoding="utf-8") as file:
             file.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<LanguageData>")
@@ -72,11 +71,16 @@ def write_to_file(path, data):
 
 
 def run():
-    input_path_to_mod_file = (input("Вкажіть шлях до файлу моду: "))
-    obtained_data = get_data_from_file(input_path_to_mod_file)
-    filtered_data = data_filter(obtained_data)
-    input_path_to_translation_file = (input("Вкажіть шлях до файлу перекладу: "))
-    write_to_file(input_path_to_translation_file, filtered_data)
+    # input_path_to_mod_file = (input("Вкажіть шлях до файлу моду: "))
+    input_path_to_mod_file = "Buildings_Temperature.xml"
+    obtained_data = get_data_from_file(path=input_path_to_mod_file)
+    filtered_data = data_filter(obtained_data=obtained_data)
+    # input_path_to_translation_file = (input("Вкажіть шлях до файлу перекладу: "))
+    input_path_to_translation_file = "Test.xml"
+    write_to_file(path=input_path_to_translation_file, data=filtered_data)
+
+
+run()
 
 
 def get_path_to_about_xml(path_to_mods_folder):
@@ -86,15 +90,21 @@ def get_path_to_about_xml(path_to_mods_folder):
             list_path.append(entry.name)
     path_to_about_xml = []
     for i in list_path:
-        path_to_about_xml.append("C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\" + i + "\\About\\About.xml")
+        path_to_about_xml.append("C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\" + i +
+                                 "\\About\\About.xml")
     return path_to_about_xml
 
+
+def find_file(file_name, search_directory):
+    for root, dirs, files in os.walk(search_directory):
+        if file_name in files:
+            return os.path.join(root, file_name)
+    return None
 
 
 def get_mod_names():
     path_to_mods_folder = "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100"
     list_of_path_to_about_xml = get_path_to_about_xml(path_to_mods_folder)
-    list_of_path_to_about_xml.sort(reverse=True)
     mod_names = list()
 
     for i in range(len(list_of_path_to_about_xml)):
@@ -113,15 +123,7 @@ def get_mod_names():
                 test4 = test3.replace("</name>", "")
                 test5 = test4.strip()
                 mod_names.append(test5)
+        mod_names.sort()
     return mod_names
 
-
-# path = get_path_to_about_xml("C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100")
-# path.sort(reverse=True)
-# print(path, "\n", len(path))
-
-# print(get_mod_names())
-# об'єкт класу, вікно програми
-App(title="Конструктор перекладу", size=(800, 600), mod_names=get_mod_names())
-
-# run()
+# App(title="Конструктор перекладу", size=(800, 600), mod_names=get_mod_names())

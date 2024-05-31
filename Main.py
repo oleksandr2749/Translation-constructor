@@ -1,4 +1,4 @@
-# from UI import App
+from UI import App
 import os
 import pathlib
 
@@ -11,6 +11,7 @@ def get_data_from_file(path: str):
     except FileNotFoundError:
         print("Помилка функції get_data_from_file")
         return None
+
 
 # Функція створення списку відфільтрованих даних отриманих від get_data_from_file
 def get_filtered_data(obtained_data):
@@ -61,7 +62,7 @@ def run():
     write_to_file(path=input_path_to_translation_file, data=get_filtered_data(get_data_from_file(path=input_path_to_mod_file)))
 
 
-# run()
+#run()
 
 
 def get_path_to_about_xml(path_to_mods_folder):
@@ -87,10 +88,6 @@ def get_mod_names():
     path_to_mods_folder = "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100"
     mod_names = list()
 
-    for i in basepath.iterdir():
-        if i.is_dir():
-            print(i.name)
-
     for i in range(len(list_of_path_to_about_xml)):
         path_to_about_xml = str(list_of_path_to_about_xml[i])
         try:
@@ -112,7 +109,6 @@ def get_mod_names():
 
 #get_mod_names()
 
-ModNames = ["Мій мод", "Інший мод"]
-ModId = ["00001", "00002"]
-
-#App(title="Конструктор перекладу", size=(800, 600), mod_names=get_mod_names())
+# ModNames = ["Тестова назва", "Тестова назва 2"]
+# ModId = ["00001", "00002"]
+# ModAuthors = ["Тестовий автор", "Тестовий автор 2"]

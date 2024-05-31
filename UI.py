@@ -2,32 +2,19 @@ import customtkinter
 import Main
 
 
-class ModList(customtkinter.CTkFrame):
+class ModList(customtkinter.CTkScrollableFrame):
     def __init__(self, master):
         super().__init__(master)
-        self.name = Main.ModNames
-        self.identifier = Main.ModId
-        self.author = Main.ModAuthors
+        self.name = Main.get_mod_names()
+        print(self.name)
         self.mod_list = []
 
-        for i, (name, identifier, author) in enumerate(zip(self.name, self.identifier, self.author)):
+        for i, name in enumerate(self.name):
             mod_name = customtkinter.CTkLabel(self, text=name)
-            mod_name.configure(font=("Arial", 25))
+            mod_name.configure(font=("Arial", 20))
             mod_name.bind("<Double-Button-1>", self.clickable)
-            mod_name.grid(row=i * 2, column=0, padx=10, pady=0, sticky="w")
+            mod_name.grid(row=i, column=0, padx=10, pady=(0, 5), sticky="w")
             self.mod_list.append(mod_name)
-
-            mod_id = customtkinter.CTkLabel(self, text=f"id-{identifier}")
-            mod_id.configure(font=("Arial", 15), text_color="Gray")
-            mod_id.bind("<Double-Button-1>", self.copy)
-            mod_id.grid(row=i * 2 + 1, column=2, padx=0, pady=0, sticky="w")
-            self.mod_list.append(mod_id)
-
-            mod_author = customtkinter.CTkLabel(self, text=f"{author}")
-            mod_author.configure(font=("Arial", 15), text_color="Gray")
-            mod_author.bind("<Double-Button-1>", self.copy)
-            mod_author.grid(row=i * 2 + 1, column=0, padx=10, pady=0, sticky="w")
-            self.mod_list.append(mod_author)
 
     def clickable(self, event):
         print("Натиснуто")
@@ -61,9 +48,9 @@ class App(customtkinter.CTk):
         self.SearchString.configure(width=400, height=35, corner_radius=0, fg_color="#2b2d30", border_color="", font=("Arial", 15), placeholder_text="Пошук (назва, автор, айді)")
         self.SearchString.grid(row=0, column=0, padx=10, pady=10, sticky="ens")
 
-        self.mod_list_frame = ModList(self.ModListFrame)
-        self.mod_list_frame.configure(fg_color="#1e1f22", corner_radius=0)
-        self.mod_list_frame.grid(row=1, column=0, padx=10, pady=10, sticky="w")
+        self.mod_list = ModList(self.ModListFrame)
+        self.mod_list.configure(height=500, fg_color="#1e1f22", corner_radius=0)
+        self.mod_list.grid(row=1, column=0, padx=10, pady=10, sticky="we")
 
 
 app = App()

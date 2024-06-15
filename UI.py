@@ -8,6 +8,7 @@ class ModList(customtkinter.CTkScrollableFrame):
         self.name = Main.get_mod_names()
         print(self.name)
         self.mod_list = []
+        # self.path_to_mod = Main.
 
         for i, name in enumerate(self.name):
             mod_name = customtkinter.CTkLabel(self, text=name)

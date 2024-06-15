@@ -62,49 +62,46 @@ def run():
     write_to_file(path=input_path_to_translation_file, data=get_filtered_data(get_data_from_file(path=input_path_to_mod_file)))
 
 
-#run()
+# run()
+
+class Mod:
+    def __init__(self, path=None, name=None, author=None, supported_versions=None, package_id=None, published_file_id=None):
+        self.__Path = path
+        self.__Name = name
+        self.__Author = author
+        self.__SupportedVersions = supported_versions
+        self.__PackageId = package_id
+        self.__PublishedFileId = published_file_id
+
+    def return_atribute(self):
+        return self.__Path, self.__Name, self.__Author, self.__SupportedVersions, self.__PackageId, self.__PublishedFileId
 
 
-def get_path_to_about_xml(path_to_mods_folder):
-    list_path = list()
-    with os.scandir(path_to_mods_folder) as entries:
-        for entry in entries:
-            list_path.append(entry.name)
-    path_to_about_xml = []
-    for i in list_path:
-        path_to_about_xml.append('C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\' + i +
-                                 '\\About\\About.xml')
-    return path_to_about_xml
-
-
-def find_file(file_name, search_directory):
-    for root, dirs, files in os.walk(search_directory):
-        if file_name in files:
-            return os.path.join(root, file_name)
-    return None
-
-
-def get_mod_names():
-    mod_names = list()
+def find_mod_folder():
     for path in Path('/').rglob('Steam/steamapps/workshop/content/294100'):
         if path.is_dir():
-            path.resolve()
-            break
-    basepath = Path.cwd() / path.resolve()
-    for i in basepath.iterdir():
-        i /= 'About/About.xml'
-        path_to_about = i
-        try:
-            with open(path_to_about, 'r', encoding='utf-8') as file:
-                test = file.readlines()
-        except FileNotFoundError:
-            print('Помилка обробки шляху моду')
-            return None
-        for a in test:
-            if '<name>' in a:
-                a = a.replace('<name>', "")
-                a = a.replace('</name>', "")
-                a = a.strip()
-                mod_names.append(a)
-    mod_names.sort()
-    return mod_names
+            return path.resolve()
+
+
+def get_path_to_mod(path_to_mod_folder):
+    pass
+
+
+def create_mod_list():
+    path_to_mod_folder = find_mod_folder()
+
+    subdirs = list()
+    for i in path_to_mod_folder.iterdir():
+        if i.is_dir():
+            subdirs.append(i.name)
+
+    mods = list()
+    for i in range(len(subdirs)):
+        mods.append(Mod(path=subdirs[i]))
+    return mods
+
+
+mod_list = create_mod_list()
+print()
+for i in range(len(mod_list)):
+    print('Обє\'кт', i, mod_list[i].return_atribute())

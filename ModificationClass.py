@@ -2,16 +2,15 @@ from pathlib import Path
 
 # Клас модифікації
 class Mod:
-    def __init__(self, packageid=None, path=None, name=None, author=None, supported_versions=None, published_file_id=None):
+    def __init__(self, packageid=None, path=None, name=None, author=None, supported_versions=None):
         self.__PackageId = packageid
         self.__Path = path
         self.__Name = name
         self.__Author = author
         self.__SupportedVersions = supported_versions
-        self.__PublishedFileId = published_file_id
 
     def return_atribute(self):
-        return self.__PackageId, self.__Path, self.__Name, self.__Author, self.__SupportedVersions, self.__PublishedFileId
+        return self.__PackageId, self.__Path, self.__Name, self.__Author, self.__SupportedVersions
 
 
 # Функція отримання істинного шляху до теки модів гри.
@@ -94,8 +93,7 @@ def create_mod_list():
                         path=path,
                         name=get_mod_name(path=path_to_about),
                         author=get_mod_author(path=path_to_about),
-                        supported_versions=get_supported_version(path=path_to_about),
-                        published_file_id=path.name
+                        supported_versions=get_supported_version(path=path_to_about)
                         )
                     )
     return mods

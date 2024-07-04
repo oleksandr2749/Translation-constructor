@@ -1,8 +1,8 @@
 from pathlib import Path
 
+
 # Клас модифікації
 class Mod:
-
     def __init__(self, path=None):
         self.__Path = path
         self.__PackageId = path.name
@@ -56,20 +56,14 @@ class Mod:
         except FileNotFoundError:
             print('Помилка функції')
 
-    def __get_name(self, i):
-        pass
-
-    def __get_author(self, i):
-        pass
-
-    def __get_supported_version(self, i):
-        pass
-
-    def return_atribute(self):
+    def get_atribute(self):
         return 'Шлях -', self.__Path, 'Ід -', self.__PackageId, 'Назва -', self.__Name, 'Автор  -', self.__Author, 'Версії -', self.__SupportedVersion
 
-    def return_name(self):
+    def get_name(self):
         return self.__Name
+
+    def get_path(self):
+        return self.__Path
 
 
 # Функція отримання істинного шляху до теки модів гри.

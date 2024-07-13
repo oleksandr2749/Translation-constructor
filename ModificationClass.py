@@ -1,86 +1,81 @@
 from pathlib import Path
+import xml.etree.ElementTree as ET
+# import Main
 
 
 # Клас модифікації
 class Mod:
-    def __init__(self, path=None):
-        self.__Path = path
-        self.__PackageId = path.name
-        self.__Name = str()
-        self.__Author = str()
-        self.__SupportedVersion = str()
-        try:
-            with open(path/'About'/'About.xml', 'r', encoding='utf-8') as file:
-                name_is_set = False
-                author_is_set = False
-                is_author_str = False
-                supported_version_is_set = False
-                is_supported_version_str = False
-                for i in file.readlines():
-                    i = i.strip()
-                    if (i.startswith('<name>') and i.endswith('</name>')) or (i.startswith('<displayName>') and i.endswith('</displayName>') and (name_is_set is False)):
-                        self.__Name = i.replace('<displayName>', '').replace('</displayName>', '').replace('<name>', '').replace('</name>', '')
-                        name_is_set = True
-                        continue
+    def __init__(self, root_path=None, package_id=None, name=None, author=None, supported_version=None):
+        self.__RootPath = root_path
+        self.__PackageId = package_id
+        self.__Name = name
+        self.__Author = author
+        self.__SupportedVersion = supported_version
 
-                    if author_is_set is False:
-                        if i.startswith('<author>') and i.endswith('</author>'):
-                            self.__Author = i.replace('<author>', '').replace('</author>', '')
-                            author_is_set = True
-                            continue
-
-                        if i.startswith('<authors>'):
-                            is_author_str = True
-                            continue
-                        elif i.endswith('</authors>'):
-                            self.__Author = self.__Author.removesuffix(', ')
-                            author_is_set = True
-                            is_author_str = False
-                            continue
-                        elif is_author_str is True:
-                            self.__Author += i.replace('<li>', '').replace('</li>', '') + ', '
-                            continue
-
-                    if supported_version_is_set is False:
-                        if i.startswith('<supportedVersions>'):
-                            is_supported_version_str = True
-                            continue
-                        elif i.endswith('</supportedVersions>'):
-                            self.__SupportedVersion = self.__SupportedVersion.removesuffix(' ')
-                            supported_version_is_set = True
-                            is_supported_version_str = False
-                            continue
-                        elif is_supported_version_str is True:
-                            self.__SupportedVersion += i.replace('<li>', '').replace('</li>', '') + ' '
-                            continue
-        except FileNotFoundError:
-            print('Помилка функції')
-
-    def get_atribute(self):
-        return 'Шлях -', self.__Path, 'Ід -', self.__PackageId, 'Назва -', self.__Name, 'Автор  -', self.__Author, 'Версії -', self.__SupportedVersion
-
-    def get_name(self):
-        return self.__Name
-
-    def get_path(self):
-        return self.__Path
+    def get_attribute(self, attribute_name):
+        if attribute_name == 'RootPath':
+            return self.__RootPath
+        elif attribute_name == 'PackageId':
+            return self.__PackageId
+        elif attribute_name == 'Name':
+            return self.__Name
+        elif attribute_name == 'Author':
+            return self.__Author
+        elif attribute_name == 'SupportedVersion':
+            return self.__SupportedVersion
+        elif attribute_name == 'All':
+            return  self.__RootPath, self.__PackageId, self.__Name, self.__Author, self.__SupportedVersion
+        else:
+            raise AttributeError(f'Атрибут "{attribute_name}" не вірний')
 
 
 # Функція отримання істинного шляху до теки модів гри.
 # Знаходить шлях незалежно від місця розташування теки.
 # Зробити: Виправити впадання в нескінченну рекурсію пошуку, якщо файл не знайдено. Запитувати шлях, перевіряти його.
-def find_mod_folder():
+def search_294100_folder():
     for path in Path('/').rglob('Steam/steamapps/workshop/content/294100'):
-        if path.is_dir():
-            return path.resolve()
+        return path.resolve()
+
+
+def get_attributes(element, path=None, id=None):
+    attributes = {'Path': None,
+                  'Id': None,
+                  'Name': None,
+                  'Author': None,
+                  'PackageID': None}
+    attributes['Path'] = path
+    attributes['Id'] = id
+    for child in element:
+        if child.tag == 'name':
+            if child.text:
+                attributes['Name'] = child.text.strip()
+        elif child.tag == 'author':
+            if child.text:
+                attributes['Author'] = child.text.strip()
+        elif child.tag == 'authors':
+            if child.text:
+                authors = str()
+                for author in child.findall('li'):
+                    authors += author.text + ', '
+                authors = authors[:-2]
+                attributes['Author'] = authors
+        elif child.tag == 'packageId':
+            if child.text:
+                attributes['PackageId'] = child.text.strip()
+        else:
+            get_attributes(child)
+    return attributes
 
 
 # Функція ініціалізації об'єкта класу Mod. Повертає список об'єктів.
-def create_mod_object_list():
-    path_to_mod_folder = find_mod_folder()
+def create_mod_list(path_294100):
     mods = list()
-
-    for i in path_to_mod_folder.iterdir():
-        if i.is_dir():
-            mods.append(Mod(path=i))
+    for i in path_294100.iterdir():
+        tree = ET.parse(i/'About/About.xml')
+        root = tree.getroot()
+        attributes = get_attributes(element=root, path=i, id=i.name)
+        mods.append(Mod(root_path=attributes['Path'],
+                        name=attributes['Name'],
+                        author=attributes['Author'],
+                        package_id=attributes['PackageId']))
     return mods

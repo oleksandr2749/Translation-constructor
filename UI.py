@@ -33,7 +33,7 @@ class App(customtkinter.CTk):
         Process.run(path_to_mod=mod_object_list[idx].get_path())
 
 
-mod_object_list = ModificationClass.create_mod_object_list()
+mod_object_list = ModificationClass.create_mod_list()
 
 app = App(mod_object_list)
 app.mainloop()

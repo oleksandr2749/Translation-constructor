@@ -16,12 +16,19 @@ class App(customtkinter.CTk):
 
         # Поле введення для пошуку
         self.search_entry = customtkinter.CTkEntry(self)
+        self.search_entry.configure(placeholder_text='Пошук за назвою')
         self.search_entry.grid(row=0, column=0, padx=10, pady=10, sticky="we")
         self.search_entry.bind('<KeyRelease>', self.search_modifications)
 
         self.ModListFrame = customtkinter.CTkScrollableFrame(self)
         self.ModListFrame.configure(corner_radius=0, width=400)
         self.ModListFrame.grid(row=1, column=0, padx=0, pady=0, sticky="wens")
+
+        self.InputPath = customtkinter.CTkEntry(self)
+        self.InputPath.configure(placeholder_text='Вкажіть шлях до теки зберігання та натисніть Enter')
+        self.InputPath.grid(row=2, column=0, padx=10, pady=10, sticky="we")
+        self.InputPath.bind('<Return>', self.input_path)
+        self.savePath = str()
 
         self.update_mod_list(mod_object_list)
 
@@ -41,8 +48,12 @@ class App(customtkinter.CTk):
             self.AuthorLabel.configure(text=mod_object.get_attribute('Author'), font=("Helvetica", 14, "normal"), text_color="gray")
             self.AuthorLabel.grid(row=2*i+1, column=0, padx=15, pady=(0, 10), sticky="w")
 
-            # Binding для подвійного кліку на назву модифікації
+            # Binding для подвійного клацання на назву модифікації
             self.ModLabel.bind('<Double-Button-1>', lambda event, idx=i: self.clickable(event, idx))
+
+    def input_path(self, event):
+        self.InputPath.configure(text_color='Gray')
+        self.savePath = self.InputPath.get()
 
     def search_modifications(self, event):
         search_text = self.search_entry.get().strip().lower()
@@ -57,7 +68,7 @@ class App(customtkinter.CTk):
         mod_name = mod_object_list[idx].get_attribute('Name')
         print(f'Натиснуто {mod_name}')
         Process.run(modification=mod_object_list[idx].get_attribute('RootPath'),
-                    mod_name=mod_name)
+                    mod_name=mod_name, save_path=self.savePath)
 
 
 mod_object_list = ModificationClass.create_mod_list(path_294100=ModificationClass.search_294100_folder())

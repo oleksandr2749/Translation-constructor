@@ -82,16 +82,17 @@ def get_all_keyed_path(path_to_keyed):
 
 
 # Функція виконання
-def run(modification, mod_name):
+def run(modification, mod_name, save_path):
     # словник шляхів тек моду перекладу
-    mod_folder_paths = {'folder': Path('/home/oleksanlr/Стільниця/Програма').joinpath(mod_name),
-                        'languages': Path('/home/oleksanlr/Стільниця/Програма').joinpath(mod_name, 'Languages'),
-                        'ukrainian': Path('/home/oleksanlr/Стільниця/Програма').joinpath(mod_name, 'Languages//Ukrainian'),
-                        'definjected': Path('/home/oleksanlr/Стільниця/Програма').joinpath(mod_name, 'Languages/Ukrainian/DefInjected'),
-                        'keyed': Path('/home/oleksanlr/Стільниця/Програма').joinpath(mod_name, 'Languages/Ukrainian/Keyed')}
+    mod_folder_paths = {'folder': Path(save_path).joinpath(mod_name),
+                        'languages': Path(save_path).joinpath(mod_name, 'Languages'),
+                        'ukrainian': Path(save_path).joinpath(mod_name, 'Languages//Ukrainian'),
+                        'definjected': Path(save_path).joinpath(mod_name, 'Languages/Ukrainian/DefInjected'),
+                        'keyed': Path(save_path).joinpath(mod_name, 'Languages/Ukrainian/Keyed')}
 
     # Створення базових тек моду перекладу
     mod_folder_paths['folder'].mkdir(exist_ok=True)
+    print(mod_folder_paths['folder'])
     mod_folder_paths['languages'].mkdir(exist_ok=True)
     mod_folder_paths['ukrainian'].mkdir(exist_ok=True)
 

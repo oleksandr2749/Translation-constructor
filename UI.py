@@ -44,7 +44,7 @@ class App(customtkinter.CTk):
                                  height=30)
         self.InputPath.grid(row=2, column=0, padx=(5, 200), pady=0, sticky="we")
         self.InputPath.bind('<Return>', self.input_path)
-        self.savePath = str('/home/oleksanlr/Тестування роботи програми')
+        self.savePath = str()
 
         self.update_mod_list(mod_object_list)
 
@@ -58,15 +58,17 @@ class App(customtkinter.CTk):
         self.update_mod_list(filtered_mods)
 
     def update_mod_list(self, mod_object_list):
+        element_number = 0
+
         for widget in self.ModListFrame.grid_slaves():
             if int(widget.grid_info()["row"]) > 1:
                 widget.grid_forget()
-
         for i, mod_object in enumerate(mod_object_list):
             self.ModLabel = customtkinter.CTkLabel(self.ModListFrame)
             self.ModLabel.configure(text=mod_object.get_attribute('Name'), font=("Helvetica", 18, "normal"))
             self.ModLabel.grid(row=2*i, column=0, padx=10, pady=0, sticky="w")
-            self.ModLabel.bind('<Double-Button-1>', lambda event, idx=i: self.start_event(event, idx))
+            self.ModLabel.bind('<Double-Button-1>', lambda event, idx=element_number: self.start_event(event, idx))
+            element_number += 1
 
     def input_path(self, event):
         self.InputPath.configure(text_color='Gray')

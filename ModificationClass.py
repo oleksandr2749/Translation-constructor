@@ -1,6 +1,5 @@
 from pathlib import Path
 import xml.etree.ElementTree as ET
-import psutil
 
 
 # Клас модифікації
@@ -33,7 +32,7 @@ class Mod:
 # Знаходить шлях незалежно від місця розташування теки.
 # Зробити: Виправити впадання в нескінченну рекурсію пошуку, якщо файл не знайдено. Запитувати шлях, перевіряти його.
 def search_294100_folder():
-    volumes = ['A:', 'B:', 'C:', 'D:', 'E:', 'F:', 'G:', 'H:', 'I:', 'J:', 'K:', 'L:', 'M:', 'N:', 'O:', 'P:', 'Q:', 'R:', 'S:', 'T:', 'U:', 'V:', 'W:', 'X:', 'Y:', 'Z:',]
+    volumes = ['/', 'A:', 'B:', 'C:', 'D:', 'E:', 'F:', 'G:', 'H:', 'I:', 'J:', 'K:', 'L:', 'M:', 'N:', 'O:', 'P:', 'Q:', 'R:', 'S:', 'T:', 'U:', 'V:', 'W:', 'X:', 'Y:', 'Z:',]
 
     for volume in volumes:
         for path in Path(volume).rglob('Steam/steamapps/workshop/content/294100'):

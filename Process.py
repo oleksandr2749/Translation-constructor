@@ -10,29 +10,37 @@ def get_data(file):
     for tag in root:
         if tag.find('label') is not None or tag.find('description') is not None:
             data.append(tag)
-    if not data:
-        raise Exception('Помилка витягування')
     return data
 
 
 def data_process(data):
     root = ET.Element('LanguageData')
     for i in data:
-        for defName in i.iter('defName'):
-            pass
+        # defName = 'RWTC: ПОМИЛКА ОТРИМАННЯ defName'
+        for defName_element in i.iter('defName'):
+            defName = defName_element
+            '''print('Тип - ', type(defName))
+            print('Тег - ', defName.tag)
+            print('Текст - ', defName.text)'''
         for a in i.iter('label'):
             root.append(ET.Comment(a.text))
             ET.SubElement(root, defName.text + '.label').text = a.text
         for a in i.iter('description'):
-            root.append(ET.Comment(a.text))
-            ET.SubElement(root, defName.text + '.description').text = a.text
+            try:
+                root.append(ET.Comment(a.text))
+                ET.SubElement(root, defName.text + '.description').text = a.text
+            except:
+                root.append(ET.Comment('RWTC:ПОМИЛКА ОТРИМАННЯ defName. ЕЛЕМЕНТ ПРОПУЩЕНО'))
     ET.indent(root, level=0)
     return root
 
 
 def process(file, def_path):
     mod_data = get_data(file)
+    if not mod_data:
+        return
 
+    # print(file.name)
     root = data_process(mod_data)
     tree = ET.ElementTree(root)
     save_path = Path(def_path).joinpath(mod_data[0].tag)

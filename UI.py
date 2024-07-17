@@ -1,7 +1,6 @@
 import customtkinter
 import ModificationClass
 import Process
-import time
 
 class App(customtkinter.CTk):
     def __init__(self, mod_object_list):
@@ -45,7 +44,7 @@ class App(customtkinter.CTk):
                                  height=30)
         self.InputPath.grid(row=2, column=0, padx=(5, 200), pady=0, sticky="we")
         self.InputPath.bind('<Return>', self.input_path)
-        self.savePath = str()
+        self.savePath = str('/home/oleksanlr/Тестування роботи програми')
 
         self.update_mod_list(mod_object_list)
 
@@ -64,12 +63,9 @@ class App(customtkinter.CTk):
                 widget.grid_forget()
 
         for i, mod_object in enumerate(mod_object_list):
-            # Label для назви модифікації
             self.ModLabel = customtkinter.CTkLabel(self.ModListFrame)
             self.ModLabel.configure(text=mod_object.get_attribute('Name'), font=("Helvetica", 18, "normal"))
             self.ModLabel.grid(row=2*i, column=0, padx=10, pady=0, sticky="w")
-
-            # Binding для подвійного клацання на назву модифікації
             self.ModLabel.bind('<Double-Button-1>', lambda event, idx=i: self.start_event(event, idx))
 
     def input_path(self, event):

@@ -1,6 +1,6 @@
 from pathlib import Path
 import xml.etree.ElementTree as ET
-# import Main
+import time
 
 
 # Клас модифікації
@@ -33,8 +33,12 @@ class Mod:
 # Знаходить шлях незалежно від місця розташування теки.
 # Зробити: Виправити впадання в нескінченну рекурсію пошуку, якщо файл не знайдено. Запитувати шлях, перевіряти його.
 def search_294100_folder():
-    for path in Path('/').rglob('Steam/steamapps/workshop/content/294100'):
-        return path.resolve()
+    try:
+        for path in Path('/').rglob('Steam/steamapps/workshop/content/294100'):
+            return path.resolve()
+    except:
+        print(f'{time.ctime()} Помилка: функція search_294100_folder')
+
 
 
 def get_attributes(element, path=None, id=None):

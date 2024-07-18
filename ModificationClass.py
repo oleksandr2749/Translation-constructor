@@ -1,31 +1,53 @@
 from pathlib import Path
 import xml.etree.ElementTree as ET
+from typing import Union, Tuple, Callable, Optional, Any
 
 
 # Клас модифікації
 class Mod:
-    def __init__(self, root_path=None, package_id=None, name=None, author=None, supported_version=None):
-        self.__RootPath = root_path
-        self.__PackageId = package_id
-        self.__Name = name
-        self.__Author = author
-        self.__SupportedVersion = supported_version
+    def __init__(self, root_path, package_id, name, author, supported_version, published_file_id):
 
-    def get_attribute(self, attribute_name):
-        if attribute_name == 'RootPath':
-            return self.__RootPath
-        elif attribute_name == 'PackageId':
-            return self.__PackageId
-        elif attribute_name == 'Name':
-            return self.__Name
-        elif attribute_name == 'Author':
-            return self.__Author
-        elif attribute_name == 'SupportedVersion':
-            return self.__SupportedVersion
-        elif attribute_name == 'All':
-            return  self.__RootPath, self.__PackageId, self.__Name, self.__Author, self.__SupportedVersion
+        self.root_path = root_path
+        self.package_id = package_id
+        self.name = name
+        self.author = author
+        self.supported_version = supported_version
+        self.published_file_Id = published_file_id
+
+    def get_attribute(self, attribute):
+        if attribute == 'RootPath':
+            return self.root_path
+        elif attribute == 'PackageId':
+            return self.package_id
+        elif attribute == 'Name':
+            return self.name
+        elif attribute == 'Author':
+            return self.author
+        elif attribute == 'SupportedVersion':
+            return self.supported_version
+        elif attribute == 'PublishedFileId':
+            return self.published_file_Id
+        elif attribute == 'All':
+            return self.root_path, self.package_id, self.name, self.author, self.supported_version
         else:
-            raise AttributeError(f'Атрибут "{attribute_name}" не вірний')
+            raise AttributeError(f'Атрибут "{attribute}" не вірний')
+
+    def set_attribute(self, attribute: str, value: Union[str, Path]):
+        if attribute == 'RootPath':
+            if attribute is Path:
+                self.root_path = value
+            else:
+                raise AttributeError(f'Значення "{value}" не вірний')
+        elif attribute == 'PackageId':
+            self.package_id = value
+        elif attribute == 'Name':
+            self.name = value
+        elif attribute == 'Author':
+            self.author = value
+        elif attribute == 'SupportedVersion':
+            self.supported_version = value
+        elif attribute == 'PublishedFileId':
+            self.published_file_Id = value
 
 
 # Функція отримання істинного шляху до теки модів гри.
@@ -39,14 +61,10 @@ def search_294100_folder():
             return path.resolve()
 
 
-def get_attributes(element, path=None, id=None):
-    attributes = {'Path': None,
-                  'Id': None,
-                  'Name': None,
-                  'Author': None,
-                  'PackageID': None}
+def get_attributes(element, path=None, test=None):
+    attributes = dict()
     attributes['Path'] = path
-    attributes['Id'] = id
+    attributes['Id'] = test
     for child in element:
         if child.tag == 'name':
             if child.text:
@@ -75,9 +93,14 @@ def create_mod_list(path_294100):
     for i in path_294100.iterdir():
         tree = ET.parse(i/'About/About.xml')
         root = tree.getroot()
-        attributes = get_attributes(element=root, path=i, id=i.name)
+        attributes = get_attributes(element=root, path=i, test=i.name)
         mods.append(Mod(root_path=attributes['Path'],
                         name=attributes['Name'],
                         author=attributes['Author'],
                         package_id=attributes['PackageId']))
     return mods
+
+
+mod_object_list = create_mod_list(path_294100=search_294100_folder())
+for mod in mod_object_list:
+    print(mod)

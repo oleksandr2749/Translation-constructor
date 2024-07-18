@@ -90,7 +90,7 @@ def get_all_keyed_path(path_to_keyed):
 
 
 # Функція виконання
-def run(modification, mod_name, save_path):
+def run(modification, save_path):
     # словник шляхів тек моду перекладу
     mod_folder_paths = {'folder': Path(save_path).joinpath(mod_name),
                         'languages': Path(save_path).joinpath(mod_name, 'Languages'),

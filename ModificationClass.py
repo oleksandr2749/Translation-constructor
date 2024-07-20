@@ -5,13 +5,13 @@ from typing import Union, Tuple, Callable, Optional, Any
 
 # Клас модифікації
 class Mod:
-    def __init__(self, root_path, package_id, name, author, supported_version, published_file_id):
+    def __init__(self, root_path, package_id, name, author, supported_versions, published_file_id):
 
         self.root_path = root_path
         self.package_id = package_id
         self.name = name
         self.author = author
-        self.supported_version = supported_version
+        self.supported_version = supported_versions
         self.published_file_Id = published_file_id
 
     def get_attribute(self, attribute):
@@ -61,46 +61,35 @@ def search_294100_folder():
             return path.resolve()
 
 
-def get_attributes(element, path=None, test=None):
-    attributes = dict()
-    attributes['Path'] = path
-    attributes['Id'] = test
-    for child in element:
-        if child.tag == 'name':
-            if child.text:
-                attributes['Name'] = child.text.strip()
-        elif child.tag == 'author':
-            if child.text:
-                attributes['Author'] = child.text.strip()
-        elif child.tag == 'authors':
-            if child.text:
-                authors = str()
-                for author in child.findall('li'):
-                    authors += author.text + ', '
-                authors = authors[:-2]
-                attributes['Author'] = authors
-        elif child.tag == 'packageId':
-            if child.text:
-                attributes['PackageId'] = child.text.strip()
-        else:
-            get_attributes(child)
-    return attributes
-
-
 # Функція ініціалізації об'єкта класу Mod. Повертає список об'єктів.
 def create_mod_list(path_294100):
     mods = list()
     for i in path_294100.iterdir():
         tree = ET.parse(i/'About/About.xml')
         root = tree.getroot()
-        attributes = get_attributes(element=root, path=i, test=i.name)
-        mods.append(Mod(root_path=attributes['Path'],
-                        name=attributes['Name'],
-                        author=attributes['Author'],
-                        package_id=attributes['PackageId']))
+        mod_data = {
+            'root_path': i,
+            'published_file_id': i.name
+        }
+        for child in root:
+            if child.tag == 'name':
+                mod_data['name'] = child.text
+            elif child.tag == 'author':
+                mod_data['author'] = child.text
+            elif child.tag == 'authors':
+                authors = str()
+                for author in child.findall('li'):
+                    authors += author.text + ', '
+                authors = authors[:-2]
+                mod_data['author'] = authors
+            elif child.tag == 'supportedVersions':
+                sv = str()
+                for test in child.findall('li'):
+                    sv += test.text + ', '
+                sv = sv[:-2]
+                mod_data['supported_versions'] = sv
+            elif child.tag == 'packageId':
+                mod_data['package_id'] = child.text
+
+        mods.append(Mod(**mod_data))
     return mods
-
-
-mod_object_list = create_mod_list(path_294100=search_294100_folder())
-for mod in mod_object_list:
-    print(mod)

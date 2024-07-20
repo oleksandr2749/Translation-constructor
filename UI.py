@@ -99,7 +99,7 @@ class App(customtkinter.CTk):
         # print(id(event.widget))
         # print(self.mod_label_map)
         # print(f'Натиснуто {event.widget.cget('text')}')
-        Process.run(self.mod_label_map[event.widget.cget('text')], Path('/home/oleksanlr/Тестування роботи програми'))
+        Process.run(self.mod_label_map[event.widget.cget('text')], self.savePath)
 
 
 mod_object_list = ModificationClass.create_mod_list(path_294100=ModificationClass.search_294100_folder())

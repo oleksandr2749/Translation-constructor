@@ -1,77 +1,109 @@
 import customtkinter
 import ModificationClass
 import Process
+from pathlib import Path
+
 
 class App(customtkinter.CTk):
     def __init__(self, mod_object_list):
         super().__init__()
-        self.title("Конструктор перекладу 0.3.2")
-        self.geometry('415x580')
-        self.minsize(415, 580)
-        self.maxsize(415, 580)
-        self.configure()
+        self.title('Конструктор перекладу')
+        self.geometry('800x600')
+        # self.minsize(415, 580)
+        # self.maxsize(415, 580)
+        self.grid_rowconfigure(index=1, weight=1)
+        self.grid_columnconfigure(index=0, weight=1)
 
-        self.grid_rowconfigure(0, weight=0)
-        self.grid_rowconfigure(1, weight=1)
+        self.label_list = list()
+        self.mod_label_map = {}
 
-        # Поле введення для пошуку
-        self.search_entry = customtkinter.CTkEntry(self)
-        self.search_entry.configure(placeholder_text='Пошук за назвою')
-        self.search_entry.grid(row=0, column=0, padx=10, pady=10, sticky="we")
-        self.search_entry.bind('<KeyRelease>', self.search_modifications)
+        # Рядок пошуку
+        self.SearchBar = customtkinter.CTkEntry(self)
+        self.SearchBar.configure(corner_radius=0, placeholder_text='Пошук за назвою', height=30)
+        self.SearchBar.grid(row=0, column=0, padx=5, pady=5, sticky='we')
+        self.SearchBar.bind('<KeyRelease>', lambda event: self.search_modifications(event, self.label_list))
 
+        # Рамка списку модифікацій
         self.ModListFrame = customtkinter.CTkScrollableFrame(self)
-        self.ModListFrame.configure(corner_radius=0, width=400)
-        self.ModListFrame.grid(row=1, column=0, padx=0, pady=0, sticky="wens")
+        self.ModListFrame.configure(corner_radius=0)
+        self.ModListFrame.grid(row=1, column=0, padx=5, pady=5, sticky="wens")
 
-        self.InputPath = customtkinter.CTkEntry(self)
-        self.InputPath.configure(placeholder_text='Вкажіть шлях до теки зберігання та натисніть Enter')
-        self.InputPath.grid(row=2, column=0, padx=10, pady=10, sticky="we")
+        # Нижня рамка
+        self.BottomFrame = customtkinter.CTkFrame(self)
+        self.BottomFrame.configure(corner_radius=0)
+        self.BottomFrame.grid(row=2, column=0, padx=5, pady=5, sticky="wens")
+        self.BottomFrame.grid_columnconfigure(index=0, weight=1)
+        # self.BottomFrame.grid_columnconfigure(index=0, weight=1)
+
+        # Кнопка налаштувань
+        self.SettingButton = customtkinter.CTkButton(self.BottomFrame)
+        self.SettingButton.configure(corner_radius=0, text='Налаштування')
+        self.SettingButton.grid(row=0, column=3, padx=5, pady=5)
+
+        # Кнопка Discord
+        self.SettingButton = customtkinter.CTkButton(self.BottomFrame)
+        self.SettingButton.configure(corner_radius=0, text='DC',
+                                     fg_color='RoyalBlue4',
+                                     hover_color='RoyalBlue3',
+                                     width='30')
+        self.SettingButton.grid(row=0, column=2, padx=5, pady=5)
+
+        # Кнопка відображення автора
+        self.AutorButton = customtkinter.CTkButton(self.BottomFrame)
+        self.AutorButton.configure(corner_radius=0, text='А', width='30')
+        self.AutorButton.grid(row=0, column=1, padx=5, pady=5)
+
+        # Рядок шляху збереження
+        self.InputPath = customtkinter.CTkEntry(self.BottomFrame)
+        self.InputPath.configure(corner_radius=0,
+                                 placeholder_text='Вкажіть шлях до теки зберігання та натисніть Enter')
+        self.InputPath.grid(row=0, column=0, padx=5, pady=5, sticky='we')
         self.InputPath.bind('<Return>', self.input_path)
         self.savePath = str()
 
-        self.update_mod_list(mod_object_list)
-
-    def update_mod_list(self, mod_object_list):
-        for widget in self.ModListFrame.grid_slaves():
-            if int(widget.grid_info()["row"]) > 1:
-                widget.grid_forget()
-
         for i, mod_object in enumerate(mod_object_list):
-            # Label для назви модифікації
             self.ModLabel = customtkinter.CTkLabel(self.ModListFrame)
             self.ModLabel.configure(text=mod_object.get_attribute('Name'), font=("Helvetica", 18, "normal"))
-            self.ModLabel.grid(row=2*i, column=0, padx=10, pady=0, sticky="w")
+            self.ModLabel.bind('<Double-Button-1>', self.start_event)
+            # self.ModLabel.bind('<Button-1>', self.print_text)
+            self.label_list.append(self.ModLabel)
+            self.mod_label_map[self.ModLabel.cget('text')] = mod_object
+            # print(f'Створено об\'єкт {self.ModLabel.cget('text')}')
 
-            # Label для автора модифікації
-            self.AuthorLabel = customtkinter.CTkLabel(self.ModListFrame)
-            self.AuthorLabel.configure(text=mod_object.get_attribute('Author'), font=("Helvetica", 14, "normal"), text_color="gray")
-            self.AuthorLabel.grid(row=2*i+1, column=0, padx=15, pady=(0, 10), sticky="w")
+        self.list_update(self.label_list)
 
-            # Binding для подвійного клацання на назву модифікації
-            self.ModLabel.bind('<Double-Button-1>', lambda event, idx=i: self.clickable(event, idx))
+    def search_modifications(self, event, testlist):
+        searchtestlist = list()
+        for mod in testlist:
+            mod.grid_forget()
+        for i, mod in enumerate(testlist):
+            if self.SearchBar.get().strip().lower() in mod.cget('text').strip().lower():
+                searchtestlist.append(mod)
+        if searchtestlist:
+            self.list_update(searchtestlist)
+
+    def list_update(self, testlist):
+        # print(f'\nВикликано функцію list_update\n')
+        for i, mod in enumerate(testlist):
+            mod.grid(row=i, column=0, padx=5, pady=0, sticky="w")
+            # print(f'До списку додано {mod.cget('text')}')
+
+    def print_text(self, event):
+        print(event.widget.cget('text'))
 
     def input_path(self, event):
         self.InputPath.configure(text_color='Gray')
-        self.savePath = self.InputPath.get()
+        self.savePath = Path(self.InputPath.get())
 
-    def search_modifications(self, event):
-        search_text = self.search_entry.get().strip().lower()
-        filtered_mods = []
-        for mod_object in mod_object_list:
-            mod_name = mod_object.get_attribute('Name').lower()
-            if search_text in mod_name:
-                filtered_mods.append(mod_object)
-        self.update_mod_list(filtered_mods)
-
-    def clickable(self, event, idx):
-        mod_name = mod_object_list[idx].get_attribute('Name')
-        print(f'Натиснуто {mod_name}')
-        Process.run(modification=mod_object_list[idx].get_attribute('RootPath'),
-                    mod_name=mod_name, save_path=self.savePath)
+    def start_event(self, event):
+        # print(id(event.widget))
+        # print(self.mod_label_map)
+        # print(f'Натиснуто {event.widget.cget('text')}')
+        Process.run(self.mod_label_map[event.widget.cget('text')], self.savePath)
 
 
 mod_object_list = ModificationClass.create_mod_list(path_294100=ModificationClass.search_294100_folder())
 
+customtkinter.set_default_color_theme('blue')
 app = App(mod_object_list)
 app.mainloop()

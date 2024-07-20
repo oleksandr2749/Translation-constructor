@@ -10,29 +10,37 @@ def get_data(file):
     for tag in root:
         if tag.find('label') is not None or tag.find('description') is not None:
             data.append(tag)
-    if not data:
-        raise Exception('Помилка витягування')
     return data
 
 
 def data_process(data):
     root = ET.Element('LanguageData')
     for i in data:
-        for defName in i.iter('defName'):
-            pass
+        # defName = 'RWTC: ПОМИЛКА ОТРИМАННЯ defName'
+        for defName_element in i.iter('defName'):
+            defName = defName_element
+            '''print('Тип - ', type(defName))
+            print('Тег - ', defName.tag)
+            print('Текст - ', defName.text)'''
         for a in i.iter('label'):
             root.append(ET.Comment(a.text))
             ET.SubElement(root, defName.text + '.label').text = a.text
         for a in i.iter('description'):
-            root.append(ET.Comment(a.text))
-            ET.SubElement(root, defName.text + '.description').text = a.text
+            try:
+                root.append(ET.Comment(a.text))
+                ET.SubElement(root, defName.text + '.description').text = a.text
+            except:
+                root.append(ET.Comment('RWTC:ПОМИЛКА ОТРИМАННЯ defName. ЕЛЕМЕНТ ПРОПУЩЕНО'))
     ET.indent(root, level=0)
     return root
 
 
 def process(file, def_path):
     mod_data = get_data(file)
+    if not mod_data:
+        return
 
+    # print(file.name)
     root = data_process(mod_data)
     tree = ET.ElementTree(root)
     save_path = Path(def_path).joinpath(mod_data[0].tag)
@@ -82,29 +90,32 @@ def get_all_keyed_path(path_to_keyed):
 
 
 # Функція виконання
-def run(modification, mod_name, save_path):
+def run(modification, save_path):
+    print(f'змінна save_path типу {type(save_path)} = {save_path}')
     # словник шляхів тек моду перекладу
-    mod_folder_paths = {'folder': Path(save_path).joinpath(mod_name),
-                        'languages': Path(save_path).joinpath(mod_name, 'Languages'),
-                        'ukrainian': Path(save_path).joinpath(mod_name, 'Languages//Ukrainian'),
-                        'definjected': Path(save_path).joinpath(mod_name, 'Languages/Ukrainian/DefInjected'),
-                        'keyed': Path(save_path).joinpath(mod_name, 'Languages/Ukrainian/Keyed')}
+    mod_folder_paths = dict()
+    mod_folder_paths['folder'] = save_path/modification.get_attribute('Name')
+    mod_folder_paths['languages'] = mod_folder_paths['folder']/'Languages'
+    mod_folder_paths['ukrainian'] = mod_folder_paths['languages']/'Ukrainian'
+    mod_folder_paths['definjected'] = mod_folder_paths['ukrainian']/'DefInjected'
+    mod_folder_paths['keyed'] = mod_folder_paths['ukrainian']/'Keyed'
+
+    for i in mod_folder_paths:
+        print(f'елемент словника mod_folder_paths {i} типу {type(mod_folder_paths[i])} = {mod_folder_paths[i]}')
 
     # Створення базових тек моду перекладу
     mod_folder_paths['folder'].mkdir(exist_ok=True)
-    print(mod_folder_paths['folder'])
     mod_folder_paths['languages'].mkdir(exist_ok=True)
     mod_folder_paths['ukrainian'].mkdir(exist_ok=True)
 
-    if modification.joinpath('1.5/Defs').exists():
-        defxml_path_list = get_all_defxml_path(path_to_defdir=modification.joinpath('1.5/Defs'))
-        if defxml_path_list:
-            mod_folder_paths['definjected'].mkdir()
-            for defxml in defxml_path_list:
-                process(file=defxml, def_path=mod_folder_paths['definjected'])
-    if modification.joinpath('Languages/English/Keyed').exists():
-        keyed_path_list = get_all_keyed_path(path_to_keyed=modification.joinpath('Languages/English/Keyed'))
-        if keyed_path_list:
-            mod_folder_paths['keyed'].mkdir()
-            for keyedxml in keyed_path_list:
-                keyed_process(file=keyedxml, xml_path=mod_folder_paths['keyed'])
+    print(modification.get_attribute('RootPath')/'1.5/Defs')
+    if (modification.get_attribute('RootPath')/'1.5/Defs').exists():
+        defxml_path_list = get_all_defxml_path(path_to_defdir=modification.get_attribute('RootPath')/'1.5/Defs')
+        mod_folder_paths['definjected'].mkdir()
+        for defxml in defxml_path_list:
+            process(file=defxml, def_path=mod_folder_paths['definjected'])
+    if (modification.get_attribute('RootPath')/'Languages/English/Keyed').exists():
+        keyed_path_list = get_all_keyed_path(path_to_keyed=modification.get_attribute('RootPath')/'Languages/English/Keyed')
+        mod_folder_paths['keyed'].mkdir()
+        for keyedxml in keyed_path_list:
+            keyed_process(file=keyedxml, xml_path=mod_folder_paths['keyed'])

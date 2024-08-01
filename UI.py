@@ -1,109 +1,138 @@
-import customtkinter
-import ModificationClass
-import Process
+import sys
 from pathlib import Path
+from PyQt6.QtCore import (
+    Qt
+)
+from PyQt6.QtGui import (
+    QPalette, QColor, QPixmap, QPainter, QFont
+)
+from PyQt6.QtWidgets import (
+    QApplication, QMainWindow, QWidget, QLineEdit, QLabel, QPushButton, QGridLayout, QHBoxLayout, QComboBox,
+    QSizePolicy, QSpacerItem, QVBoxLayout, QScrollArea
+)
+from PyQt6.QtSvgWidgets import QSvgWidget
+import ModificationClass
 
 
-class App(customtkinter.CTk):
-    def __init__(self, mod_object_list):
+class ModList(QWidget):
+    def __init__(self):
         super().__init__()
-        self.title('Конструктор перекладу')
-        self.geometry('800x600')
-        # self.minsize(415, 580)
-        # self.maxsize(415, 580)
-        self.grid_rowconfigure(index=1, weight=1)
-        self.grid_columnconfigure(index=0, weight=1)
 
-        self.label_list = list()
-        self.mod_label_map = {}
+        modlistdata = ModificationClass.create_mod_list(ModificationClass.search_294100_folder())
 
-        # Рядок пошуку
-        self.SearchBar = customtkinter.CTkEntry(self)
-        self.SearchBar.configure(corner_radius=0, placeholder_text='Пошук за назвою', height=30)
-        self.SearchBar.grid(row=0, column=0, padx=5, pady=5, sticky='we')
-        self.SearchBar.bind('<KeyRelease>', lambda event: self.search_modifications(event, self.label_list))
+        self.layout = QVBoxLayout()
+        self.setLayout(self.layout)
 
-        # Рамка списку модифікацій
-        self.ModListFrame = customtkinter.CTkScrollableFrame(self)
-        self.ModListFrame.configure(corner_radius=0)
-        self.ModListFrame.grid(row=1, column=0, padx=5, pady=5, sticky="wens")
+        self.list_filling(modlistdata)
 
-        # Нижня рамка
-        self.BottomFrame = customtkinter.CTkFrame(self)
-        self.BottomFrame.configure(corner_radius=0)
-        self.BottomFrame.grid(row=2, column=0, padx=5, pady=5, sticky="wens")
-        self.BottomFrame.grid_columnconfigure(index=0, weight=1)
-        # self.BottomFrame.grid_columnconfigure(index=0, weight=1)
+    def list_filling(self, mods):
+        font = QFont()
+        font.setPointSize(16)
+        for mod in mods:
+            test_mod = QLabel(mod.name)
+            test_mod.setFont(font)
 
-        # Кнопка налаштувань
-        self.SettingButton = customtkinter.CTkButton(self.BottomFrame)
-        self.SettingButton.configure(corner_radius=0, text='Налаштування')
-        self.SettingButton.grid(row=0, column=3, padx=5, pady=5)
+            self.layout.addWidget(test_mod)
 
-        # Кнопка Discord
-        self.SettingButton = customtkinter.CTkButton(self.BottomFrame)
-        self.SettingButton.configure(corner_radius=0, text='DC',
-                                     fg_color='RoyalBlue4',
-                                     hover_color='RoyalBlue3',
-                                     width='30')
-        self.SettingButton.grid(row=0, column=2, padx=5, pady=5)
+    def filtering(self, test_filter):
+        if not test_filter.strip():
+            return
 
-        # Кнопка відображення автора
-        self.AutorButton = customtkinter.CTkButton(self.BottomFrame)
-        self.AutorButton.configure(corner_radius=0, text='А', width='30')
-        self.AutorButton.grid(row=0, column=1, padx=5, pady=5)
-
-        # Рядок шляху збереження
-        self.InputPath = customtkinter.CTkEntry(self.BottomFrame)
-        self.InputPath.configure(corner_radius=0,
-                                 placeholder_text='Вкажіть шлях до теки зберігання та натисніть Enter')
-        self.InputPath.grid(row=0, column=0, padx=5, pady=5, sticky='we')
-        self.InputPath.bind('<Return>', self.input_path)
-        self.savePath = str()
-
-        for i, mod_object in enumerate(mod_object_list):
-            self.ModLabel = customtkinter.CTkLabel(self.ModListFrame)
-            self.ModLabel.configure(text=mod_object.get_attribute('Name'), font=("Helvetica", 18, "normal"))
-            self.ModLabel.bind('<Double-Button-1>', self.start_event)
-            # self.ModLabel.bind('<Button-1>', self.print_text)
-            self.label_list.append(self.ModLabel)
-            self.mod_label_map[self.ModLabel.cget('text')] = mod_object
-            # print(f'Створено об\'єкт {self.ModLabel.cget('text')}')
-
-        self.list_update(self.label_list)
-
-    def search_modifications(self, event, testlist):
-        searchtestlist = list()
-        for mod in testlist:
-            mod.grid_forget()
-        for i, mod in enumerate(testlist):
-            if self.SearchBar.get().strip().lower() in mod.cget('text').strip().lower():
-                searchtestlist.append(mod)
-        if searchtestlist:
-            self.list_update(searchtestlist)
-
-    def list_update(self, testlist):
-        # print(f'\nВикликано функцію list_update\n')
-        for i, mod in enumerate(testlist):
-            mod.grid(row=i, column=0, padx=5, pady=0, sticky="w")
-            # print(f'До списку додано {mod.cget('text')}')
-
-    def print_text(self, event):
-        print(event.widget.cget('text'))
-
-    def input_path(self, event):
-        self.InputPath.configure(text_color='Gray')
-        self.savePath = Path(self.InputPath.get())
-
-    def start_event(self, event):
-        # print(id(event.widget))
-        # print(self.mod_label_map)
-        # print(f'Натиснуто {event.widget.cget('text')}')
-        Process.run(self.mod_label_map[event.widget.cget('text')], self.savePath)
+        for mod in self.findChildren(QLabel):
+            if test_filter not in mod.text():
+                mod.hide()
+            else:
+                continue
 
 
-mod_object_list = ModificationClass.create_mod_list(path_294100=ModificationClass.search_294100_folder())
+class TopButtonBar(QWidget):
+    def __init__(self):
+        super().__init__()
 
-customtkinter.set_default_color_theme('blue')
-app = App(mod_object_list)
-app.mainloop()
+        layout = QHBoxLayout()
+        self.setLayout(layout)
+
+        author = QSvgWidget(str(Path('UI icons and style/user.svg')))
+        author.setFixedSize(25, 25)
+        layout.addWidget(author)
+
+
+class SearchBar(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        layout = QHBoxLayout()
+        self.setLayout(layout)
+
+        sb_label = QLabel('Пошук за')
+        sb_label.setObjectName('Label')
+
+        sb_filter = QComboBox()
+        sb_filter.setObjectName('Filter')
+        sb_filter.addItem('назвою')
+        sb_filter.addItem('авторством')
+        sb_filter.addItem('айді')
+        sb_filter.setMinimumWidth(120)
+
+        sb_separator = QLabel(':')
+        sb_separator.setObjectName('Separator')
+
+        sb_input_line = QLineEdit(clearButtonEnabled=True)
+        sb_input_line.setObjectName('InputLine')
+        sb_input_line.textChanged.connect(self.get_text)
+
+        layout.addWidget(sb_label)
+        layout.addSpacing(-5)
+        layout.addWidget(sb_filter)
+        layout.addWidget(sb_separator)
+        layout.addWidget(sb_input_line)
+
+    def get_text(self):
+        test = self.findChildren(QLineEdit)
+        print(f'{test[0].text()}')
+
+
+class MainWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle("Конструктор перекладу")
+        self.setObjectName('MainWindow')
+        self.resize(800, 600)
+        self.setStyleSheet(Path('UI icons and style/UIStyle.qss').read_text())
+        main_layout = QGridLayout()
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setVerticalSpacing(0)
+        self.setLayout(main_layout)
+
+        top_bar = QWidget()
+        top_bar_layout = QHBoxLayout()
+        top_bar_layout.setContentsMargins(0, 0, 0, 0)
+        top_bar.setLayout(top_bar_layout)
+        top_bar_palette = top_bar.palette()
+        top_bar_palette.setColor(QPalette.ColorRole.Window, QColor("#2B2D30"))
+        top_bar.setPalette(top_bar_palette)
+        top_bar.setAutoFillBackground(True)
+        top_bar.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
+
+        search_bar = SearchBar()
+        top_bar_layout.addWidget(search_bar)
+
+        top_bar_button = TopButtonBar()
+        # top_bar_layout.addWidget(top_bar_button)
+
+        mod_list = ModList()
+        scroll = QScrollArea()
+        scroll.setWidget(mod_list)
+
+        main_layout.addWidget(top_bar, 0, 0)
+        main_layout.addWidget(scroll, 1, 0)
+        # main_layout.setRowStretch(1, 1)
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    # app.setStyleSheet(Path('UI icons and style/UIStyle.qss').read_text())
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec())

@@ -8,7 +8,7 @@ from PyQt6.QtGui import (
 )
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QLineEdit, QLabel, QPushButton, QGridLayout, QHBoxLayout, QComboBox,
-    QSizePolicy, QSpacerItem, QVBoxLayout, QScrollArea
+    QSizePolicy, QSpacerItem, QVBoxLayout, QScrollArea, QListWidget
 )
 from PyQt6.QtSvgWidgets import QSvgWidget
 import ModificationClass
@@ -23,25 +23,27 @@ class ModList(QWidget):
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
 
+        self.mod_list = list()
         self.list_filling(modlistdata)
+        self.layout.addStretch(1)
 
     def list_filling(self, mods):
         font = QFont()
-        font.setPointSize(16)
+        font.setPointSize(14)
         for mod in mods:
             test_mod = QLabel(mod.name)
             test_mod.setFont(font)
 
             self.layout.addWidget(test_mod)
+            self.mod_list.append(test_mod)
 
     def filtering(self, test_filter):
-        if not test_filter.strip():
-            return
-
-        for mod in self.findChildren(QLabel):
-            if test_filter not in mod.text():
+        for i in self.findChildren(QWidget):
+            i.show()
+        for mod in self.findChildren(QWidget):
+            if test_filter.lower() not in mod.text().lower():
                 mod.hide()
-            else:
+            elif test_filter.lower() in mod.text().lower():
                 continue
 
 
@@ -49,47 +51,48 @@ class TopButtonBar(QWidget):
     def __init__(self):
         super().__init__()
 
-        layout = QHBoxLayout()
-        self.setLayout(layout)
+        self.layout = QHBoxLayout()
+        self.setLayout(self.layout)
 
-        author = QSvgWidget(str(Path('UI icons and style/user.svg')))
-        author.setFixedSize(25, 25)
-        layout.addWidget(author)
+        self.author = QSvgWidget(str(Path('UI icons and style/user.svg')))
+        self.author.setFixedSize(25, 25)
+        self.layout.addWidget(self.author)
 
 
 class SearchBar(QWidget):
-    def __init__(self):
+    def __init__(self, mod_list):
         super().__init__()
 
-        layout = QHBoxLayout()
-        self.setLayout(layout)
+        self.layout = QHBoxLayout()
+        self.setLayout(self.layout)
 
-        sb_label = QLabel('Пошук за')
-        sb_label.setObjectName('Label')
+        self.sb_label = QLabel('Пошук за')
+        self.sb_label.setObjectName('Label')
 
-        sb_filter = QComboBox()
-        sb_filter.setObjectName('Filter')
-        sb_filter.addItem('назвою')
-        sb_filter.addItem('авторством')
-        sb_filter.addItem('айді')
-        sb_filter.setMinimumWidth(120)
+        self.sb_filter = QComboBox()
+        self.sb_filter.setObjectName('Filter')
+        self.sb_filter.addItem('назвою')
+        self.sb_filter.addItem('авторством')
+        self.sb_filter.addItem('айді')
+        self.sb_filter.setMinimumWidth(120)
 
-        sb_separator = QLabel(':')
-        sb_separator.setObjectName('Separator')
+        self.sb_separator = QLabel(':')
+        self.sb_separator.setObjectName('Separator')
 
-        sb_input_line = QLineEdit(clearButtonEnabled=True)
-        sb_input_line.setObjectName('InputLine')
-        sb_input_line.textChanged.connect(self.get_text)
+        self.sb_input_line = QLineEdit(clearButtonEnabled=True)
+        self.sb_input_line.setObjectName('InputLine')
+        self.sb_input_line.textChanged.connect(self.get_text)
 
-        layout.addWidget(sb_label)
-        layout.addSpacing(-5)
-        layout.addWidget(sb_filter)
-        layout.addWidget(sb_separator)
-        layout.addWidget(sb_input_line)
+        self.layout.addWidget(self.sb_label)
+        self.layout.addSpacing(-5)
+        self.layout.addWidget(self.sb_filter)
+        self.layout.addWidget(self.sb_separator)
+        self.layout.addWidget(self.sb_input_line)
+
+        self.mod_list = mod_list
 
     def get_text(self):
-        test = self.findChildren(QLineEdit)
-        print(f'{test[0].text()}')
+        self.mod_list.filtering(self.sb_input_line.text())
 
 
 class MainWindow(QWidget):
@@ -100,34 +103,34 @@ class MainWindow(QWidget):
         self.setObjectName('MainWindow')
         self.resize(800, 600)
         self.setStyleSheet(Path('UI icons and style/UIStyle.qss').read_text())
-        main_layout = QGridLayout()
-        main_layout.setContentsMargins(0, 0, 0, 0)
-        main_layout.setVerticalSpacing(0)
-        self.setLayout(main_layout)
+        self.layout = QGridLayout()
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.setVerticalSpacing(0)
+        self.setLayout(self.layout)
 
-        top_bar = QWidget()
-        top_bar_layout = QHBoxLayout()
-        top_bar_layout.setContentsMargins(0, 0, 0, 0)
-        top_bar.setLayout(top_bar_layout)
-        top_bar_palette = top_bar.palette()
-        top_bar_palette.setColor(QPalette.ColorRole.Window, QColor("#2B2D30"))
-        top_bar.setPalette(top_bar_palette)
-        top_bar.setAutoFillBackground(True)
-        top_bar.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
+        self.top_bar = QWidget()
+        self.top_bar_layout = QHBoxLayout()
+        self.top_bar_layout.setContentsMargins(0, 0, 0, 0)
+        self.top_bar.setLayout(self.top_bar_layout)
+        self.top_bar_palette = self.top_bar.palette()
+        self.top_bar_palette.setColor(QPalette.ColorRole.Window, QColor("#3B3F44"))
+        self.top_bar.setPalette(self.top_bar_palette)
+        self.top_bar.setAutoFillBackground(True)
+        self.top_bar.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
 
-        search_bar = SearchBar()
-        top_bar_layout.addWidget(search_bar)
+        self.mod_list = ModList()
+        self.scroll = QScrollArea()
+        self.scroll.setWidget(self.mod_list)
+
+        self.search_bar = SearchBar(self.mod_list)
+        self.top_bar_layout.addWidget(self.search_bar)
 
         top_bar_button = TopButtonBar()
-        # top_bar_layout.addWidget(top_bar_button)
+        #top_bar_layout.addWidget(top_bar_button)
 
-        mod_list = ModList()
-        scroll = QScrollArea()
-        scroll.setWidget(mod_list)
-
-        main_layout.addWidget(top_bar, 0, 0)
-        main_layout.addWidget(scroll, 1, 0)
-        # main_layout.setRowStretch(1, 1)
+        self.layout.addWidget(self.top_bar, 0, 0)
+        self.layout.addWidget(self.scroll, 1, 0)
+        self.layout.setRowStretch(1, 1)
 
 
 if __name__ == '__main__':

@@ -4,7 +4,7 @@ from PyQt6.QtCore import (
     Qt
 )
 from PyQt6.QtGui import (
-    QPalette, QColor, QPixmap, QPainter, QFont
+    QPalette, QColor, QPixmap, QPainter, QFont, QMouseEvent
 )
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QLineEdit, QLabel, QPushButton, QGridLayout, QHBoxLayout, QComboBox,
@@ -12,6 +12,20 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtSvgWidgets import QSvgWidget
 import ModificationClass
+import Process
+
+
+class ClickableQLabel(QLabel):
+    def __init__(self, text, mod, parent=None):
+        super().__init__(text, parent)
+        self.mod = mod
+
+    def mousePressEvent(self, event: QMouseEvent):
+        self.on_label_clicked()
+        super().mousePressEvent(event)
+
+    def on_label_clicked(self):
+        Process.run(modification=self.mod, save_path=Path('/home/oleksandr/Desktop/MyProgram'))
 
 
 class ModList(QWidget):
@@ -31,7 +45,7 @@ class ModList(QWidget):
         font = QFont()
         font.setPointSize(14)
         for mod in mods:
-            test_mod = QLabel(mod.name)
+            test_mod = ClickableQLabel(mod.name, mod)
             test_mod.setFont(font)
 
             self.layout.addWidget(test_mod)

@@ -1,0 +1,34 @@
+QWidget {
+    font: 16px;
+    color: lightGray;
+}
+
+#ListModLabel{
+    font: 24px;
+}
+
+#SearchFilterComboBox{
+    border: none;
+    background: transparent;
+}
+
+#SearchLineEditor{
+
+}
+
+#PatchInputLine {
+    border: 1px solid gray;
+    border-radius: 3;
+}
+
+QRadioButton::indicator:unchecked {
+    image: url(/home/oleksandr/PycharmProjects/Translation-Constructor/GUI/Icons and style/off.svg);
+}
+QRadioButton::indicator:checked {
+    image: url(/home/oleksandr/PycharmProjects/Translation-Constructor/GUI/Icons and style/on.svg);
+}
+
+#SettingNote{
+    font: 14px;
+    color: gray;
+}

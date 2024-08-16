@@ -14,6 +14,19 @@ class QModLabel(QLabel):
         super().__init__(text=mod.name, parent=parent)
         self.mod = mod
 
+        self.i = QPackageId(mod)
+        self.a = QAuthor(mod)
+
+    def show(self):
+        super().show()
+        self.i.show()
+        self.a.show()
+
+    def hide(self):
+        super().hide()
+        self.i.hide()
+        self.a.hide()
+
     def mousePressEvent(self, event: QMouseEvent):
         self.on_label_clicked()
         super().mousePressEvent(event)
@@ -21,8 +34,22 @@ class QModLabel(QLabel):
     def on_label_clicked(self):
         Process.run(modification=self.mod, save_path=pathlib.Path(Main.config.get('Settings', 'export_path')))
 
-    def __repr__(self):
-        return f'Mod({self.mod})'
+
+class QAttribute(QLabel):
+    def __init__(self, text, parent=None, object_name=None, color='gray'):
+        super().__init__(text=text, parent=parent)
+        self.setObjectName(object_name)
+        self.setStyleSheet(f'#{object_name} {{ color: {color};}}')
+
+
+class QPackageId(QAttribute):
+    def __init__(self, mod, parent=None):
+        super().__init__(text=mod.package_id, parent=parent, object_name='PackageId')
+
+
+class QAuthor(QAttribute):
+    def __init__(self, mod, parent=None):
+        super().__init__(text=mod.author, parent=parent, object_name='Author')
 
 
 class ModList(QScrollArea):
@@ -70,18 +97,33 @@ class ModList(QScrollArea):
             test_mod = QModLabel(mod=mod)
             test_mod.setObjectName('ListModLabel')
             test_mod.setFont(font)
-
             mod_list.append(test_mod)
+            mod_list.append(test_mod.i)
+            mod_list.append(test_mod.a)
 
-        mod_list.sort(key=lambda mod: mod.mod.name)
+        #mod_list.sort(key=lambda mod: mod.mod.name)
+
         for mod in mod_list:
             self.layout.addWidget(mod)
 
     def filtering(self, test_filter):
-        for i in self.findChildren(QLabel):
-            '''i.show()
-            print(f'{i} відображено')'''
+        for i in self.findChildren(QModLabel):
             if (test_filter != ' ') and (test_filter.lower() in i.mod.name.lower()):
                 i.show()
             else:
                 i.hide()
+
+    def mods_group(self, mod_list):
+        for previous, current in zip(mod_list[:-1], mod_list[1:]):
+            # print(f'Поточний:{current} Попередній: {previous}')
+            # print(current.mod.name)
+            for current_first_word, previous_first_word in zip(current.mod.name, previous.mod.name):
+                # print(f'{previous.mod.name} {previous_first_word} та {current.mod.name} {current_first_word}')
+
+                if current_first_word != previous_first_word:
+                    # print(f'{previous.mod.name} та {current.mod.name} моди не однієї групи')
+                    break
+                elif (current_first_word == ' ') and (previous_first_word == ' '):
+                    QLabel(f'{previous.mod.name}------------------------------------------')
+                    print(f'{previous.mod.name} та {current.mod.name} моди однієї групи')
+                    break

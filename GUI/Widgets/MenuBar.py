@@ -85,7 +85,7 @@ class LocalizationSettingsWidget(QWidget):
         super().__init__(parent)
         self.setWindowFlags(Qt.Popup)
         self.setObjectName('LocalizationSettings')
-        self.setFixedSize(200, 150)
+        self.setFixedSize(200, 115)
         self.setStyleSheet('''#LocalizationSettings {
         background: #1A1D20;
         }

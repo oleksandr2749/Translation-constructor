@@ -14,6 +14,7 @@
 from GUI.Widgets.MenuBar import MenuBar
 from GUI.Widgets.TopBar import TopBar
 from GUI.Widgets.ModList import ModList
+from GUI.Widgets.StatusBar import StatusBar
 
 from PySide6.QtWidgets import (QWidget, QGridLayout, QMenuBar, QMenu, QSpacerItem, QSizePolicy, QMainWindow)
 from PySide6.QtCore import QRect
@@ -51,3 +52,6 @@ class MainWindow(QMainWindow):
 
         self.menu_bar_widget = MenuBar()
         self.setMenuBar(self.menu_bar_widget)
+
+        self.status_bar = StatusBar(mods_number=len(self.main_widget.mod_list.modlistdata))
+        self.setStatusBar(self.status_bar)

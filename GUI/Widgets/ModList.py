@@ -21,6 +21,9 @@ class QModLabel(QLabel):
     def on_label_clicked(self):
         Process.run(modification=self.mod, save_path=pathlib.Path(Main.config.get('Settings', 'export_path')))
 
+    def __repr__(self):
+        return f'Mod({self.mod})'
+
 
 class ModList(QScrollArea):
     def __init__(self, parent=None):
@@ -56,20 +59,23 @@ class ModList(QScrollArea):
         self.setWidget(self.widget)
         self.setWidgetResizable(True)
 
-        # self.mod_list = list()
         self.list_filling()
         self.layout.addStretch(1)
 
     def list_filling(self):
         font = QFont()
         font.setPointSize(14)
+        mod_list = list()
         for mod in self.modlistdata:
             test_mod = QModLabel(mod=mod)
             test_mod.setObjectName('ListModLabel')
             test_mod.setFont(font)
 
-            self.layout.addWidget(test_mod)
-            # self.mod_list.append(test_mod)
+            mod_list.append(test_mod)
+
+        mod_list.sort(key=lambda mod: mod.mod.name)
+        for mod in mod_list:
+            self.layout.addWidget(mod)
 
     def filtering(self, test_filter):
         for i in self.findChildren(QLabel):

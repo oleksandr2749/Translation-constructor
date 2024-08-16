@@ -84,14 +84,23 @@ class LocalizationSettingsWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowFlags(Qt.Popup)
-        self.setFixedSize(200, 100)
+        self.setObjectName('LocalizationSettings')
+        self.setFixedSize(200, 150)
+        self.setStyleSheet('''#LocalizationSettings {
+        background: #1A1D20;
+        }
+        #LocalizationList {
+        border: none;
+        background: transparent;
+        }''')
 
         layout = QGridLayout()
 
-        label = QLabel('Долучайтесь до GitHub та\nробіть внесок щоб додати\nбільше мов')
+        label = QLabel('Долучайтесь до проек\nту на GitHub та додай\nсвою мову.')
         layout.addWidget(label, 1, 0)
 
         self.localization_list = QComboBox()
+        self.localization_list.setObjectName('LocalizationList')
         self.localization_list.addItem(QIcon('GUI/Icons and style/flag-UA.svg'), 'Українська')
         self.localization_list.addItem(QIcon('GUI/Icons and style/flag-UK.svg'), 'English')
         layout.addWidget(self.localization_list, 0, 0)

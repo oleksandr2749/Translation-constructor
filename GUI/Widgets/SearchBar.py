@@ -11,9 +11,7 @@
 # You should have received a copy of the GNU General Public License along with Translation Constructor.
 # If not, see <https://www.gnu.org/licenses/>.
 
-from PySide6.QtWidgets import QMenuBar, QMenu, QComboBox, QWidgetAction, QGridLayout, QWidget, QLabel, QHBoxLayout, QLineEdit, QSizePolicy
-from PySide6.QtCore import QRect, Qt, QPoint
-from PySide6.QtGui import QIcon, QFont, QAction
+from PySide6.QtWidgets import QComboBox, QWidget, QLabel, QHBoxLayout, QLineEdit
 
 
 class SearchBar(QWidget):

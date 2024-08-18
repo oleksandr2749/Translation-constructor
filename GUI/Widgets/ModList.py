@@ -17,9 +17,8 @@ import ModificationClass
 import Process
 import pathlib
 
-from PySide6.QtWidgets import QMenuBar, QMenu, QComboBox, QWidgetAction, QGridLayout, QWidget, QLabel, QHBoxLayout, QLineEdit, QVBoxLayout, QScrollArea
-from PySide6.QtCore import QRect, Qt, QPoint
-from PySide6.QtGui import QIcon, QFont, QAction, QMouseEvent, QPalette, QColor
+from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QScrollArea
+from PySide6.QtGui import QFont, QMouseEvent
 
 
 class QModLabel(QLabel):

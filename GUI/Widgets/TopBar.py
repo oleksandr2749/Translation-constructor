@@ -11,17 +11,11 @@
 # You should have received a copy of the GNU General Public License along with Translation Constructor.
 # If not, see <https://www.gnu.org/licenses/>.
 
-from PySide6.QtWidgets import (QMenuBar, QMenu, QComboBox, QWidgetAction, QGridLayout, QWidget, QLabel, QSizePolicy,
-                               QLineEdit, QMainWindow, QHBoxLayout, QPushButton)
-from PySide6.QtCore import QRect, Qt, QPoint
-from PySide6.QtGui import QIcon, QFont, QAction, QPalette, QColor, QMouseEvent
+from PySide6.QtWidgets import QGridLayout, QWidget, QHBoxLayout
+from PySide6.QtGui import QMouseEvent
 from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtSvg import QSvgRenderer
 
 from GUI.Widgets.SearchBar import SearchBar
-
-import pathlib as Path
-
 
 class SVGWidget(QSvgWidget):
     def mousePressEvent(self, event: QMouseEvent):

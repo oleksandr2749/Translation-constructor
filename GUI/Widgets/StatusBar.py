@@ -11,12 +11,7 @@
 # You should have received a copy of the GNU General Public License along with Translation Constructor.
 # If not, see <https://www.gnu.org/licenses/>.
 
-from PySide6.QtWidgets import (QMenuBar, QComboBox, QGridLayout, QWidget, QLabel, QSizePolicy, QLineEdit, QSpacerItem,
-                               QRadioButton, QButtonGroup, QPushButton, QMenu, QToolButton, QToolBox, QVBoxLayout,
-                               QTreeView, QFileSystemModel, QFileDialog, QToolTip,QStatusBar)
-from PySide6.QtCore import Qt, QPoint, QDir
-from PySide6.QtGui import QIcon, QAction
-
+from PySide6.QtWidgets import QLabel, QStatusBar
 
 class StatusBar(QStatusBar):
     def __init__(self, mods_number, parent=None):

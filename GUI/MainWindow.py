@@ -16,8 +16,7 @@ from GUI.Widgets.TopBar import TopBar
 from GUI.Widgets.ModList import ModList
 from GUI.Widgets.StatusBar import StatusBar
 
-from PySide6.QtWidgets import (QWidget, QGridLayout, QMenuBar, QMenu, QSpacerItem, QSizePolicy, QMainWindow)
-from PySide6.QtCore import QRect
+from PySide6.QtWidgets import (QWidget, QGridLayout, QMainWindow)
 
 
 class MainWidget(QWidget):

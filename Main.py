@@ -15,9 +15,28 @@ from GUI import MainWindow
 import sys
 import configparser
 import pathlib
+import logging
 
 from PySide6.QtWidgets import QApplication
 
+# Журнал подій
+logging.addLevelName(logging.DEBUG, 'НАЛАГОДЖЕННЯ')
+logging.addLevelName(logging.INFO, 'ІНФ.')
+logging.addLevelName(logging.WARNING, 'УВАГА')
+logging.addLevelName(logging.ERROR, 'ПОМИЛКА')
+logging.addLevelName(logging.CRITICAL, 'КРИТИЧНА ПОМИЛКА')
+logging.basicConfig(
+    filename='program.log',
+    encoding='utf-8',
+    filemode='w',
+
+    format='{asctime} {levelname} - {message}',
+    style='{',
+    datefmt='%Y/%m/%d %H:%M:%S',
+    level=logging.DEBUG
+)
+
+# Файл налаштувань
 config = configparser.ConfigParser()
 if not pathlib.Path('config.ini').exists():
     config['Settings'] = {'export_path': 'NotSet'}

@@ -32,7 +32,7 @@ class QModLabel(QLabel):
         super().mousePressEvent(event)
 
     def on_label_clicked(self):
-        Process.run(modification=self.mod, save_path=pathlib.Path(Main.config.get('Settings', 'export_path')))
+        Process.run(modification=self.mod, export_path=pathlib.Path(Main.config.get('Settings', 'export_path')))
 
 
 class QAttribute(QLabel):
@@ -44,7 +44,7 @@ class QAttribute(QLabel):
 
 class QPackageId(QAttribute):
     def __init__(self, mod, parent=None):
-        super().__init__(text=mod.package_id, parent=parent, object_name='PackageId')
+        super().__init__(text=mod.published_file_Id, parent=parent, object_name='PackageId')
 
 
 class QAuthor(QAttribute):

@@ -11,75 +11,45 @@
 # You should have received a copy of the GNU General Public License along with Translation Constructor. If not,
 # see <https://www.gnu.org/licenses/>.
 
+import logging
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
 
-def get_data(file):
-    tree = ET.parse(file)
-    root = tree.getroot()
-    data = list()
-
-    for tag in root:
-        if tag.find('label') is not None or tag.find('description') is not None:
-            data.append(tag)
-    return data
-
-
-def data_process(data):
-    root = ET.Element('LanguageData')
-    for i in data:
-        # defName = 'RWTC: ПОМИЛКА ОТРИМАННЯ defName'
-        for defName_element in i.iter('defName'):
-            defName = defName_element
-            '''print('Тип - ', type(defName))
-            print('Тег - ', defName.tag)
-            print('Текст - ', defName.text)'''
-        for a in i.iter('label'):
-            root.append(ET.Comment(a.text))
-            ET.SubElement(root, defName.text + '.label').text = a.text
-        for a in i.iter('description'):
-            try:
-                root.append(ET.Comment(a.text))
-                ET.SubElement(root, defName.text + '.description').text = a.text
-            except:
-                root.append(ET.Comment('RWTC:ПОМИЛКА ОТРИМАННЯ defName. ЕЛЕМЕНТ ПРОПУЩЕНО'))
-    ET.indent(root, level=0)
-    return root
-
-
-def process(file, def_path):
-    mod_data = get_data(file)
-    if not mod_data:
-        return
-
-    # print(file.name)
-    root = data_process(mod_data)
-    tree = ET.ElementTree(root)
-    save_path = Path(def_path).joinpath(mod_data[0].tag)
-    save_path.mkdir(exist_ok=True)
-    tree.write(file_or_filename=save_path.joinpath(file.name), encoding='utf-8', xml_declaration=True)
-
-
-def get_keyed_data(file):
+def read_xml(file):
     tree = ET.parse(file)
     root = tree.getroot()
     return root
 
 
-def keyed_data_process(data):
+def def_process(mod_data):
     root = ET.Element('LanguageData')
-    for element in data:
-        root.append(ET.Comment(element.text))
-        ET.SubElement(root, element.tag).text = element.text
+    def_name = None
+    for element in mod_data.iter():
+        if element.tag == 'defName':
+            def_name = element
+            continue
+        if def_name is not None:
+            if element.tag == 'label':
+                root.append(ET.Comment(element.text))
+                ET.SubElement(root, def_name.text + '.label').text = element.text
+            elif element.tag == 'description':
+                root.append(ET.Comment(element.text))
+                ET.SubElement(root, def_name.text + '.description').text = element.text
+
     ET.indent(root, level=0)
-    return root
+
+    if len(root) == 0:
+        return None
+    else:
+        return root
 
 
-def keyed_process(file, xml_path):
-    root = keyed_data_process(get_keyed_data(file))
-    tree = ET.ElementTree(root)
-    tree.write(file_or_filename=xml_path.joinpath(file.name), encoding='utf-8', xml_declaration=True)
+def xml_file_write(data, path, name):
+    tree = ET.ElementTree(data)
+    if not path.exists():
+        path.mkdir()
+    tree.write(file_or_filename=path / name, encoding='utf-8', xml_declaration=True)
 
 
 def get_all_defxml_path(path_to_defdir):
@@ -92,43 +62,64 @@ def get_all_defxml_path(path_to_defdir):
     return defxml_path_list
 
 
-def get_all_keyed_path(path_to_keyed):
-    keyedxml_path_list = list()
-    for element in path_to_keyed.iterdir():
-        if element.is_file():
-            keyedxml_path_list.append(element)
-        else:
-            keyedxml_path_list.extend(get_all_defxml_path(element))
-    return keyedxml_path_list
-
-
 # Функція виконання
-def run(modification, save_path):
-    print(f'змінна save_path типу {type(save_path)} = {save_path}')
-    # словник шляхів тек моду перекладу
+def run(modification, export_path):
+    logging.info('Викликано функцію run для %s', modification.get_attribute('Name'))
+    # Словник шляхів тек моду перекладу
     mod_folder_paths = dict()
-    mod_folder_paths['folder'] = save_path/modification.get_attribute('Name')
-    mod_folder_paths['languages'] = mod_folder_paths['folder']/'Languages'
+    mod_folder_paths['root'] = export_path / modification.get_attribute('Name')
+    mod_folder_paths['languages'] = mod_folder_paths['root']/'Languages'
     mod_folder_paths['ukrainian'] = mod_folder_paths['languages']/'Ukrainian'
     mod_folder_paths['definjected'] = mod_folder_paths['ukrainian']/'DefInjected'
     mod_folder_paths['keyed'] = mod_folder_paths['ukrainian']/'Keyed'
 
-    for i in mod_folder_paths:
-        print(f'елемент словника mod_folder_paths {i} типу {type(mod_folder_paths[i])} = {mod_folder_paths[i]}')
+    folder_to_create = (mod_folder_paths['root'], mod_folder_paths['languages'], mod_folder_paths['ukrainian'])
 
     # Створення базових тек моду перекладу
-    mod_folder_paths['folder'].mkdir(exist_ok=True)
-    mod_folder_paths['languages'].mkdir(exist_ok=True)
-    mod_folder_paths['ukrainian'].mkdir(exist_ok=True)
+    logging.info('Розпочато створення базових тек моду перекладу в %s', export_path)
+    for folder in folder_to_create:
+        try:
+            folder.mkdir()
+        except FileExistsError:
+            logging.warning('Тека %s вже існує', folder.name)
+        except Exception:
+            logging.error('Не вдалось створити теку %s', folder.name, exc_info=True)
+        else:
+            logging.info('Створено теку %s', folder.name)
 
-    print(modification.get_attribute('RootPath')/'1.5/Defs')
-    if (modification.get_attribute('RootPath')/'1.5/Defs').exists():
-        defxml_path_list = get_all_defxml_path(path_to_defdir=modification.get_attribute('RootPath')/'1.5/Defs')
-        mod_folder_paths['definjected'].mkdir()
-        for defxml in defxml_path_list:
-            process(file=defxml, def_path=mod_folder_paths['definjected'])
+    # Процес отримання Defs
+    logging.info('Розпочато процес отримання Defs')
+    defs_to_find = (modification.get_attribute('RootPath')/'1.5/Defs', modification.get_attribute('RootPath')/'Defs')
+
+    found = False
+    for defs_fonder in defs_to_find:
+        if defs_fonder.exists():
+            found = True
+            defxml_path_list = get_all_defxml_path(path_to_defdir=defs_fonder)
+            mod_folder_paths['definjected'].mkdir(exist_ok=True)
+            for defxml in defxml_path_list:
+                # print(defxml.name)
+                def_data = read_xml(file=defxml)
+                def_process_data = def_process(mod_data=def_data)
+
+                if def_process_data is None:
+                    continue
+                else:
+                    xml_file_write(data=def_process_data, path=mod_folder_paths['definjected'] / Path(def_data[0].tag), name=defxml.name)
+    if found is True:
+        pass
+    if found is False:
+        logging.error('Не знайдено теку Defs. Викликано функцію сповіщення!')
+
+    # Процес отримання Keyed
     if (modification.get_attribute('RootPath')/'Languages/English/Keyed').exists():
-        keyed_path_list = get_all_keyed_path(path_to_keyed=modification.get_attribute('RootPath')/'Languages/English/Keyed')
-        mod_folder_paths['keyed'].mkdir()
-        for keyedxml in keyed_path_list:
-            keyed_process(file=keyedxml, xml_path=mod_folder_paths['keyed'])
+        for file in Path(modification.get_attribute('RootPath')/'Languages/English/Keyed').iterdir():
+            data = read_xml(file)
+
+            root = ET.Element('LanguageData')
+            for element in data:
+                root.append(ET.Comment(element.text))
+                root.append(element)
+            ET.indent(root, level=0)
+
+            xml_file_write(data=root, path=mod_folder_paths['keyed'], name=file.name)

@@ -1,3 +1,16 @@
+# This file is part of Translation Constructor.
+#
+# Translation Constructor is free software: you can redistribute it and/or modify it under the terms of the GNU General
+# Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# Translation Constructor is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with Translation Constructor.
+# If not, see <https://www.gnu.org/licenses/>.
+
 import GUI.Widgets.MenuBar
 import Main
 import ModificationClass
@@ -15,17 +28,17 @@ class QModLabel(QLabel):
         self.mod = mod
 
         self.i = QPackageId(mod)
-        self.a = QAuthor(mod)
+        # self.a = QAuthor(mod)
 
     def show(self):
         super().show()
         self.i.show()
-        self.a.show()
+        # self.a.show()
 
     def hide(self):
         super().hide()
         self.i.hide()
-        self.a.hide()
+        # self.a.hide()
 
     def mousePressEvent(self, event: QMouseEvent):
         self.on_label_clicked()
@@ -44,7 +57,7 @@ class QAttribute(QLabel):
 
 class QPackageId(QAttribute):
     def __init__(self, mod, parent=None):
-        super().__init__(text=mod.published_file_Id, parent=parent, object_name='PackageId')
+        super().__init__(text=mod.package_id, parent=parent, object_name='PackageId')
 
 
 class QAuthor(QAttribute):
@@ -99,7 +112,7 @@ class ModList(QScrollArea):
             test_mod.setFont(font)
             mod_list.append(test_mod)
             mod_list.append(test_mod.i)
-            mod_list.append(test_mod.a)
+            # mod_list.append(test_mod.a)
 
         #mod_list.sort(key=lambda mod: mod.mod.name)
 

@@ -30,15 +30,16 @@ class Mode(QWidget):
 
         title_label = QLabel()
         title_label.setObjectName('ModeTitle')
-        title_label.setText('Режим виконання *')
+        title_label.setText('Режим виконання (Тестування)')
 
         mode1 = QRadioButton()
         mode1.setObjectName('Mode1')
-        mode1.setText('Звичайний (Лінукс сумісний)')
+        mode1.setText('Кругла кнопка 1')
+        mode1.setEnabled(False)
 
         mode2 = QRadioButton()
         mode2.setObjectName('Mode2')
-        mode2.setText('Повний')
+        mode2.setText('Кругла кнопка 2')
         mode2.setEnabled(False)
 
         layout.addWidget(title_label, 0, 0)

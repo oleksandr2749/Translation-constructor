@@ -27,6 +27,9 @@ QRadioButton::indicator:unchecked {
 QRadioButton::indicator:checked {
     image: url(/home/oleksandr/PycharmProjects/Translation-Constructor/GUI/Icons and style/on.svg);
 }
+QRadioButton:!enabled {
+    color: gray;
+}
 
 #SettingNote{
     font: 14px;

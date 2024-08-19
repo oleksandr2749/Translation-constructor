@@ -58,7 +58,9 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MainWindow.MainWindow()
     window.show()
+    app.setStyle('fusion')
     with open("GUI/Icons and style/style", "r") as f:
         _style = f.read()
         app.setStyleSheet(_style)
+
     sys.exit(app.exec())

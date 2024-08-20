@@ -17,8 +17,8 @@ from GUI.Widgets.ModList import ModList
 from GUI.Widgets.StatusBar import StatusBar
 
 from PySide6.QtWidgets import QWidget, QGridLayout, QMainWindow
-from PySide6.QtGui import QIcon
-from PySide6.QtSvgWidgets import QGraphicsSvgItem
+from PySide6.QtGui import QIcon, QClipboard, QPixmap, QPainter
+from PySide6.QtSvg import QSvgRenderer
 
 
 class MainWidget(QWidget):
@@ -45,7 +45,7 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("Конструктор перекладу")
-        self.setWindowIcon(QIcon('GUI/Icons and style/icon.svg'))
+
         self.setObjectName('MainWindow')
         self.resize(800, 600)
 

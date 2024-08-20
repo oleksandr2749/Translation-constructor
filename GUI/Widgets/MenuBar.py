@@ -12,7 +12,7 @@
 # If not, see <https://www.gnu.org/licenses/>.
 
 from PySide6.QtWidgets import (QMenuBar, QComboBox, QGridLayout, QWidget, QLabel, QLineEdit, QRadioButton, QPushButton,
-                               QVBoxLayout, QTreeView, QFileSystemModel, QFileDialog)
+                               QVBoxLayout, QTreeView, QFileSystemModel, QFileDialog, QGroupBox, QSlider, QHBoxLayout)
 from PySide6.QtCore import Qt, QPoint, QDir
 from PySide6.QtGui import QIcon, QAction
 
@@ -30,21 +30,58 @@ class Mode(QWidget):
 
         title_label = QLabel()
         title_label.setObjectName('ModeTitle')
-        title_label.setText('Режим виконання (Тестування)')
+        title_label.setText('')
 
-        mode1 = QRadioButton()
-        mode1.setObjectName('Mode1')
-        mode1.setText('Кругла кнопка 1')
-        mode1.setEnabled(False)
 
-        mode2 = QRadioButton()
-        mode2.setObjectName('Mode2')
-        mode2.setText('Кругла кнопка 2')
-        mode2.setEnabled(False)
+class PlacementMode(QGroupBox):
+    def __init__(self, title='Режим розміщення рядків *'):
+        super().__init__(title)
 
-        layout.addWidget(title_label, 0, 0)
-        layout.addWidget(mode1, 1, 0)
-        layout.addWidget(mode2, 2, 0)
+        self.placement_mode_accordance = QRadioButton()
+        self.placement_mode_accordance.setObjectName('PlacementModeAccordance')
+        self.placement_mode_accordance.setText('Відповідність')
+        self.placement_mode_accordance.setToolTip('Рядки перекладу будуть розміщені відповідно\n до розміщення в '
+                                                  'оригінальному моді.')
+        self.placement_mode_accordance.toggled.connect(self.limit_hide)
+
+        self.placement_mode_single = QRadioButton()
+        self.placement_mode_single.setObjectName('PlacementModeSingle')
+        self.placement_mode_single.setText('В одному файлі')
+        self.placement_mode_single.setToolTip(
+            'Рядки перекладу елементів одного типу будуть розміщені в одному файлі.\nЯкщо досягнуто ліміт рядків, буде '
+            'створено наступний файл.\nУвага! Це може призвести до відокремлення опису від назви одного\n елемента в'
+            'інший файл, що погіршує читабельність.')
+        self.placement_mode_single.toggled.connect(self.limit_show)
+
+        self.limit = QLabel('Ліміт рядків в файлі: ')
+        self.limit.hide()
+
+        self.placement_mode_single_limit = QSlider(Qt.Horizontal)
+        self.placement_mode_single_limit.setMinimum(30)
+        self.placement_mode_single_limit.setMaximum(300)
+        self.placement_mode_single_limit.setTickPosition(QSlider.TicksBelow)
+        self.placement_mode_single_limit.valueChanged.connect(self.print_value)
+        self.placement_mode_single_limit.hide()
+
+        layout = QVBoxLayout()
+        layout.addWidget(self.placement_mode_accordance)
+        layout.addWidget(self.placement_mode_single)
+        layout.addWidget(self.limit)
+        layout.addWidget(self.placement_mode_single_limit)
+
+        self.setLayout(layout)
+
+    def print_value(self, value):
+        self.limit.setText('Максимальна кількість рядків в файлі: ' + str(value))
+
+    def limit_show(self):
+        self.limit.show()
+        self.placement_mode_single_limit.show()
+
+    def limit_hide(self):
+        self.limit.hide()
+        self.placement_mode_single_limit.hide()
+
 
 
 class PathInputLine(QWidget):
@@ -232,10 +269,13 @@ class ExecutiveSettingWidget(QWidget):
 
         layout.addWidget(note, 0, 0)
         layout.addWidget(self.path_input_line, 1, 0)
-        layout.addWidget(Mode(), 2, 0)
+        # layout.addWidget(Mode(), 2, 0)
         # layout.addItem(QSpacerItem(0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding), 3, 0)
         layout.setRowStretch(4, 1)
         layout.addWidget(back, 5, 0)
+
+        placement_mode = PlacementMode()
+        layout.addWidget(placement_mode, 2, 0)
 
     def button_back(self):
         self.hide()

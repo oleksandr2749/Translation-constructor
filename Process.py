@@ -64,7 +64,7 @@ def get_all_defxml_path(path_to_defdir):
 
 # Функція виконання
 def run(modification, export_path):
-    logging.info('Викликано функцію run для %s', modification.get_attribute('Name'))
+    logging.info('Розпочато обробку для %s', modification.get_attribute('Name'))
     # Словник шляхів тек моду перекладу
     mod_folder_paths = dict()
     mod_folder_paths['root'] = export_path / modification.get_attribute('Name')
@@ -105,7 +105,8 @@ def run(modification, export_path):
                 if def_process_data is None:
                     continue
                 else:
-                    xml_file_write(data=def_process_data, path=mod_folder_paths['definjected'] / Path(def_data[0].tag), name=defxml.name)
+                    xml_file_write(data=def_process_data, path=mod_folder_paths['definjected'] / Path(def_data[0].tag),
+                                   name=defxml.name[0:-4] + '_' + modification.get_attribute('PackageId') + '.xml')
     if found is True:
         pass
     if found is False:
@@ -122,4 +123,5 @@ def run(modification, export_path):
                 root.append(element)
             ET.indent(root, level=0)
 
-            xml_file_write(data=root, path=mod_folder_paths['keyed'], name=file.name)
+            xml_file_write(data=root, path=mod_folder_paths['keyed'],
+                           name=file.name[0:-4] + '_' + modification.get_attribute('PackageId') + '.xml')

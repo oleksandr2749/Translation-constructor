@@ -17,7 +17,7 @@ import ModificationClass
 import Process
 import pathlib
 
-from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QScrollArea
+from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QScrollArea, QLineEdit
 from PySide6.QtGui import QFont, QMouseEvent
 
 
@@ -28,15 +28,18 @@ class QModLabel(QLabel):
 
         self.i = QPackageId(mod)
         # self.a = QAuthor(mod)
+        self.id = QId(mod)
 
     def show(self):
         super().show()
         self.i.show()
+        self.id.show()
         # self.a.show()
 
     def hide(self):
         super().hide()
         self.i.hide()
+        self.id.hide()
         # self.a.hide()
 
     def mousePressEvent(self, event: QMouseEvent):
@@ -47,11 +50,21 @@ class QModLabel(QLabel):
         Process.run(modification=self.mod, export_path=pathlib.Path(Main.config.get('Settings', 'export_path')))
 
 
-class QAttribute(QLabel):
+class QAttribute(QLabel, QLineEdit):
     def __init__(self, text, parent=None, object_name=None, color='gray'):
         super().__init__(text=text, parent=parent)
         self.setObjectName(object_name)
         self.setStyleSheet(f'#{object_name} {{ color: {color};}}')
+
+    def mousePressEvent(self, event: QMouseEvent):
+        self.on_label_clicked()
+        super().mousePressEvent(event)
+
+    def on_label_clicked(self):
+        print(f'Натиснуто {self.text()}')
+
+    def on_label_release(self):
+        print(f'Друга подія {self.text()}')
 
 
 class QPackageId(QAttribute):
@@ -62,6 +75,11 @@ class QPackageId(QAttribute):
 class QAuthor(QAttribute):
     def __init__(self, mod, parent=None):
         super().__init__(text=mod.author, parent=parent, object_name='Author')
+
+
+class QId(QAttribute):
+    def __init__(self, mod, parent=None):
+        super().__init__(text=mod.published_file_Id, parent=parent, object_name='Id')
 
 
 class ModList(QScrollArea):
@@ -111,6 +129,7 @@ class ModList(QScrollArea):
             test_mod.setFont(font)
             mod_list.append(test_mod)
             mod_list.append(test_mod.i)
+            mod_list.append(test_mod.id)
             # mod_list.append(test_mod.a)
 
         #mod_list.sort(key=lambda mod: mod.mod.name)
@@ -124,6 +143,10 @@ class ModList(QScrollArea):
                 i.show()
             else:
                 i.hide()
+
+    def force_hide(self):
+        for i in self.widget.children():
+            print(type(i))
 
     def mods_group(self, mod_list):
         for previous, current in zip(mod_list[:-1], mod_list[1:]):

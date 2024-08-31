@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+
+<svg
+   width="32"
+   height="32"
+   viewBox="0 0 20.48 20.48"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="project-new-svgrepo-com.svg"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#505050"
+     inkscape:zoom="16"
+     inkscape:cx="5.03125"
+     inkscape:cy="16.15625"
+     inkscape:window-width="1920"
+     inkscape:window-height="1008"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="Page-1" />
+  <title
+     id="title1">project-new</title>
+  <g
+     id="Page-1"
+     stroke="none"
+     stroke-width="1"
+     fill="none"
+     fill-rule="evenodd"
+     transform="matrix(0.05052632,0,0,0.04618802,-3.2336845,-1.5864045)">
+    <g
+       id="Combined-Shape"
+       fill="#000000"
+       transform="translate(64,34.346667)">
+      <path
+         d="M 192,0 384,110.85125 V 242.986 h -42.667 v -85.331 l -128,73.9 V 431.088 L 192,443.40501 0,332.55376 V 110.85125 Z M 42.666,157.654 42.666667,307.92014 170.666,381.82 V 231.555 Z M 192,49.267223 66.133333,121.93638 192,194.60553 317.86667,121.93638 Z"
+         id="path1"
+         style="fill:#e5e5e5;fill-opacity:1;fill-rule:evenodd;stroke-width:0.993614;stroke-dasharray:none"
+         sodipodi:nodetypes="ccccccccccccccccccccc" />
+      <path
+         d="m 343.60408,263.30175 v 67.55679 h 61.75094 v 45.02467 h -61.75094 v 67.55183 h -41.16477 v -67.55183 h -61.75094 v -45.02467 h 61.75094 v -67.55679 z"
+         style="display:inline;fill:#f3c110;fill-opacity:1;fill-rule:evenodd;stroke-width:20.7565;stroke-dasharray:none"
+         id="path1-5" />
+    </g>
+  </g>
+  <metadata
+     id="metadata1">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>project-new</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>

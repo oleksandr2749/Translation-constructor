@@ -15,15 +15,17 @@ from PySide6.QtWidgets import QGridLayout, QWidget, QHBoxLayout
 from PySide6.QtGui import QMouseEvent
 from PySide6.QtSvgWidgets import QSvgWidget
 
+import Main
 from GUI.Widgets.SearchBar import SearchBar
 
-class SVGWidget(QSvgWidget):
+
+class SVGButton(QSvgWidget):
     def mousePressEvent(self, event: QMouseEvent):
         self.on_label_clicked()
         super().mousePressEvent(event)
 
-    def on_label_clicked(self):
-        print('Натиснуто')
+    def test(self):
+        print(self)
 
 
 class TopButtonBar(QWidget):
@@ -32,11 +34,10 @@ class TopButtonBar(QWidget):
 
         self.layout = QHBoxLayout()
         self.setLayout(self.layout)
-        a = QSvgWidget()
-        self.author = SVGWidget('GUI/Icons and style/user.svg')
+        self.author = SVGButton('GUI/Icons and style/user.svg')
         self.author.setFixedSize(32, 32)
-        self.layout.addWidget(self.author)
 
+        self.layout.addWidget(self.author)
 
 class TopBar(QWidget):
     def __init__(self):

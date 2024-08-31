@@ -24,25 +24,29 @@ def read_xml(file):
 
 def def_process(mod_data):
     root = ET.Element('LanguageData')
-    def_name = None
-    for element in mod_data.iter():
-        if element.tag == 'defName':
-            def_name = element
-            continue
+    file_type = None
+    for i in mod_data:
+        def_name = i.find('defName')
+
         if def_name is not None:
-            if element.tag == 'label':
-                root.append(ET.Comment(element.text))
-                ET.SubElement(root, def_name.text + '.label').text = element.text
-            elif element.tag == 'description':
-                root.append(ET.Comment(element.text))
-                ET.SubElement(root, def_name.text + '.description').text = element.text
+            label = i.find('label')
+            if label is not None:
+                root.append(ET.Comment(label.text))
+                ET.SubElement(root, def_name.text + '.label').text = label.text
+            description = i.find('description')
+            if description is not None:
+                root.append(ET.Comment(description.text))
+                ET.SubElement(root, def_name.text + '.description').text = description.text
+            if label is not None or description is not None:
+                if file_type is None:
+                    file_type = i.tag
 
     ET.indent(root, level=0)
 
     if len(root) == 0:
-        return None
+        return None, None
     else:
-        return root
+        return root, file_type
 
 
 def xml_file_write(data, path, name):
@@ -63,8 +67,8 @@ def get_all_defxml_path(path_to_defdir):
 
 
 # Функція виконання
-def run(modification, export_path):
-    logging.info('Викликано функцію run для %s', modification.get_attribute('Name'))
+def run(modification, export_path, mode=None):
+    logging.info('Розпочато обробку для %s', modification.get_attribute('Name'))
     # Словник шляхів тек моду перекладу
     mod_folder_paths = dict()
     mod_folder_paths['root'] = export_path / modification.get_attribute('Name')
@@ -98,14 +102,16 @@ def run(modification, export_path):
             defxml_path_list = get_all_defxml_path(path_to_defdir=defs_fonder)
             mod_folder_paths['definjected'].mkdir(exist_ok=True)
             for defxml in defxml_path_list:
-                # print(defxml.name)
+                print('\n', defxml.name)
                 def_data = read_xml(file=defxml)
-                def_process_data = def_process(mod_data=def_data)
+                def_process_data, file_type = def_process(mod_data=def_data)
+                print(def_process_data, file_type)
 
                 if def_process_data is None:
                     continue
                 else:
-                    xml_file_write(data=def_process_data, path=mod_folder_paths['definjected'] / Path(def_data[0].tag), name=defxml.name)
+                    xml_file_write(data=def_process_data, path=mod_folder_paths['definjected'] / file_type,
+                                   name=defxml.name[0:-4] + '_' + modification.get_attribute('PackageId') + '.xml')
     if found is True:
         pass
     if found is False:
@@ -122,4 +128,5 @@ def run(modification, export_path):
                 root.append(element)
             ET.indent(root, level=0)
 
-            xml_file_write(data=root, path=mod_folder_paths['keyed'], name=file.name)
+            xml_file_write(data=root, path=mod_folder_paths['keyed'],
+                           name=file.name[0:-4] + '_' + modification.get_attribute('PackageId') + '.xml')

@@ -3,6 +3,17 @@ QWidget {
     color: lightGray;
 }
 
+QPushButton {
+    border: none;
+    background-color: transparent;
+}
+QPushButton:hover {
+    background-color: white;
+}
+QPushButton:pressed {
+    background-color: red;
+}
+
 #ListModLabel{
     font: 24px;
 }
@@ -12,26 +23,18 @@ QWidget {
     background: transparent;
 }
 
-#SearchLineEditor{
-
-}
-
 #PatchInputLine {
     border: 1px solid gray;
     border-radius: 3;
 }
 
-QRadioButton::indicator:unchecked {
-    image: url(/home/oleksandr/PycharmProjects/Translation-Constructor/GUI/Icons and style/off.svg);
-}
-QRadioButton::indicator:checked {
-    image: url(/home/oleksandr/PycharmProjects/Translation-Constructor/GUI/Icons and style/on.svg);
-}
-QRadioButton:!enabled {
-    color: gray;
-}
-
 #SettingNote{
     font: 14px;
     color: gray;
+}
+
+#Notification{
+    font: bold 20px;
+    color: black;
+    background: yellow;
 }

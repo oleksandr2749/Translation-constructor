@@ -1,6 +1,7 @@
+import Process
 from Process import run
 import ModificationClass
-import pathlib
+from pathlib import Path
 import logging
 
 logging.addLevelName(logging.DEBUG, 'НАЛАГОДЖЕННЯ')
@@ -26,9 +27,7 @@ logging.basicConfig(
 # logging.critical('Перевірка')
 # logging.debug("name=%s", name)
 
-ModList = ModificationClass.create_mod_list(ModificationClass.search_294100_folder())
-
-for mod in ModList:
-    if mod.published_file_Id == '3262718980':
-        run(modification=mod,
-            export_path=pathlib.Path('/home/oleksandr/Desktop/MyProgram'))
+data, file_type = Process.def_process(Process.read_xml('/home/oleksandr/294100/2975771801/1.5/Defs/NetDefs/NeutroamineNet.xml'))
+for i in data.iter():
+    print(i.tag)
+Process.xml_file_write(data, Path('/home/oleksandr/Desktop/MyProgram')/file_type, name='Тест')

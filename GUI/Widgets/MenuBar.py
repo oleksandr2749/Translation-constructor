@@ -13,40 +13,29 @@
 
 from PySide6.QtWidgets import (QMenuBar, QComboBox, QGridLayout, QWidget, QLabel, QLineEdit, QRadioButton, QPushButton,
                                QVBoxLayout, QTreeView, QFileSystemModel, QFileDialog, QGroupBox, QSlider, QHBoxLayout)
-from PySide6.QtCore import Qt, QPoint, QDir
+from PySide6.QtCore import Qt, QPoint, QDir, QPropertyAnimation, QRect, QEasingCurve
 from PySide6.QtGui import QIcon, QAction
 
 import Main
-
-
-class Mode(QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-
-        self.setToolTip(f'Пояснення вибору режимів')
-        layout = QGridLayout()
-        layout.setContentsMargins(0, 5, 0, 5)
-        self.setLayout(layout)
-
-        title_label = QLabel()
-        title_label.setObjectName('ModeTitle')
-        title_label.setText('')
+from GUI.Widgets.Settings.Parameter import RadioButton
 
 
 class PlacementMode(QGroupBox):
     def __init__(self, title='Режим розміщення рядків *'):
         super().__init__(title)
 
-        self.placement_mode_accordance = QRadioButton()
+        self.placement_mode_accordance = RadioButton()
         self.placement_mode_accordance.setObjectName('PlacementModeAccordance')
         self.placement_mode_accordance.setText('Відповідність')
         self.placement_mode_accordance.setToolTip('Рядки перекладу будуть розміщені відповідно\n до розміщення в '
                                                   'оригінальному моді.')
+        self.placement_mode_accordance.setImportance(True)
         self.placement_mode_accordance.toggled.connect(self.limit_hide)
 
-        self.placement_mode_single = QRadioButton()
+        self.placement_mode_single = RadioButton()
         self.placement_mode_single.setObjectName('PlacementModeSingle')
         self.placement_mode_single.setText('В одному файлі')
+        self.placement_mode_accordance.setImportance(True)
         self.placement_mode_single.setToolTip(
             'Рядки перекладу елементів одного типу будуть розміщені в одному файлі.\nЯкщо досягнуто ліміт рядків, буде '
             'створено наступний файл.\nУвага! Це може призвести до відокремлення опису від назви одного\n елемента в'
@@ -71,6 +60,10 @@ class PlacementMode(QGroupBox):
 
         self.setLayout(layout)
 
+    def is_important_parameter_selected(self) -> bool:
+        return (self.placement_mode_accordance.isChecked() or
+                self.placement_mode_single.isChecked())
+
     def print_value(self, value):
         self.limit.setText('Максимальна кількість рядків в файлі: ' + str(value))
 
@@ -81,7 +74,6 @@ class PlacementMode(QGroupBox):
     def limit_hide(self):
         self.limit.hide()
         self.placement_mode_single_limit.hide()
-
 
 
 class PathInputLine(QWidget):
@@ -253,6 +245,7 @@ class ExecutiveSettingWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        self.setWindowTitle('Налаштування виконання')
         layout = QGridLayout()
         self.setLayout(layout)
 
@@ -260,25 +253,69 @@ class ExecutiveSettingWidget(QWidget):
         note.setObjectName('SettingNote')
         note.setText(f'Обов\'язкові налаштування відмічені *\nНаведіться на параметр щоб побачити пояснення')
 
-        back = QPushButton()
-        back.setText('Назад')
-        back.setFixedWidth(100)
-        back.clicked.connect(self.button_back)
+        self.button = QPushButton()
+        self.button.setText('Назад')
+        self.button.setFixedWidth(100)
+        self.button.clicked.connect(self.button_back)
+        self.button.clicked.connect(self.animate_button)
+        self.check_important_parameter_callback = None
 
         self.path_input_line = PathInputLine()
 
+        self.placement_mode = PlacementMode()
+
         layout.addWidget(note, 0, 0)
         layout.addWidget(self.path_input_line, 1, 0)
-        # layout.addWidget(Mode(), 2, 0)
+        layout.addWidget(self. placement_mode, 2, 0)
         # layout.addItem(QSpacerItem(0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding), 3, 0)
         layout.setRowStretch(4, 1)
-        layout.addWidget(back, 5, 0)
+        layout.addWidget(self.button, 5, 0)
 
-        placement_mode = PlacementMode()
-        layout.addWidget(placement_mode, 2, 0)
+        self.check_important_parameter_callback = self.placement_mode.is_important_parameter_selected
 
     def button_back(self):
-        self.hide()
+        if self.check_important_parameter_callback and self.check_important_parameter_callback():
+            self.hide()
+        else:
+            print("Потрібно вибрати важливий параметр.")
+
+    def animate_button(self):
+        self.button.setStyleSheet('background-color: #912323; color: black; border: none;')
+
+        # Отримуємо поточні координати кнопки
+        current_geometry = self.button.geometry()
+
+        # Створюємо анімацію для кнопки
+        self.animation = QPropertyAnimation(self.button, b"geometry")
+
+        # Встановлюємо початкове положення анімації
+        self.animation.setStartValue(current_geometry)
+
+        # Встановлюємо проміжні та кінцеве положення для ефекту тремтіння
+        shake_distance = 10  # Відстань тремтіння в пікселях
+        self.animation.setKeyValueAt(0.25, QRect(current_geometry.x() - shake_distance, current_geometry.y(),
+                                                 current_geometry.width(), current_geometry.height()))
+        self.animation.setKeyValueAt(0.5, QRect(current_geometry.x() + shake_distance, current_geometry.y(),
+                                                current_geometry.width(), current_geometry.height()))
+        self.animation.setKeyValueAt(0.75, QRect(current_geometry.x() - shake_distance, current_geometry.y(),
+                                                 current_geometry.width(), current_geometry.height()))
+        self.animation.setEndValue(current_geometry)
+
+        # Встановлюємо тривалість анімації (в мілісекундах)
+        self.animation.setDuration(200)
+
+        # Використовуємо різкий стиль анімації
+        self.animation.setEasingCurve(QEasingCurve.OutBounce)
+
+        # Повертаємо колір кнопки в початкове положення після завершення анімації
+        self.animation.finished.connect(self.reset_button_color)
+
+        # Запускаємо анімацію
+        self.animation.start()
+
+    def reset_button_color(self):
+        # Повертаємо колір кнопки в початкове положення
+        self.button.setStyleSheet('background-color: none; color: gray;')
 
 
 class MenuBar(QMenuBar):

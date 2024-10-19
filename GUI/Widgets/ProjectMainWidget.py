@@ -1,13 +1,12 @@
-from PySide6.QtWidgets import (QWidget, QGridLayout, QLabel, QPushButton, QLineEdit, QTextEdit, QSizePolicy, QScrollBar,
-                               QScrollArea, QSpacerItem, QFrame, QVBoxLayout, QHBoxLayout)
-from PySide6.QtCore import Qt, QSize, Signal, QRect, QPropertyAnimation, QEasingCurve, QPoint
-from PySide6.QtGui import QPixmap, QColor, QImage, QMouseEvent
+from PySide6.QtWidgets import (QWidget, QGridLayout, QLabel, QPushButton, QLineEdit, QTextEdit, QSizePolicy, QScrollArea, QSpacerItem,
+                               QVBoxLayout, QHBoxLayout)
+from PySide6.QtCore import Qt, Signal
+from PySide6.QtGui import QPixmap
 
 from pathlib import Path
 import xml.etree.ElementTree as ET
-from configparser import ConfigParser
 
-from Project import Project
+from Project.Project import Project
 from GUI.Widgets.MyBaseWidgets import MyLabel
 
 
@@ -118,7 +117,7 @@ class CreateProjectWidget(QScrollArea):
 
         self.logo_label = QLabel('Логотип')
         self.logo = QLabel()
-        self.logo_pixmap = QPixmap('/home/oleksandr/PycharmProjects/Translation-Constructor/GUI/Icons and style'
+        self.logo_pixmap = QPixmap('/Resources/Icons and style'
                                    '/logo.png')
         self.logo_pixmap.fill('#404040')
         self.logo_pixmap = self.logo_pixmap.scaled(300, 150, Qt.AspectRatioMode.KeepAspectRatio)

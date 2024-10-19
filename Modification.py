@@ -5,9 +5,6 @@ import shutil
 import logging
 import xml.etree.ElementTree as ET
 
-import Testing.Debugging
-import Process
-
 
 class Modification:
     def __init__(self, name=None, package_id=None, author=None, description=None, mod_version=None,

@@ -139,7 +139,7 @@ class ModList(QScrollArea):
 
     def filtering(self, test_filter):
         for i in self.findChildren(QModLabel):
-            if (test_filter != ' ') and (test_filter.lower() in i.mod.name.lower()):
+            if (test_filter != ' ') and (test_filter.lower() in i.mod.__name.lower()):
                 i.show()
             else:
                 i.hide()
@@ -152,13 +152,13 @@ class ModList(QScrollArea):
         for previous, current in zip(mod_list[:-1], mod_list[1:]):
             # print(f'Поточний:{current} Попередній: {previous}')
             # print(current.mod.name)
-            for current_first_word, previous_first_word in zip(current.mod.name, previous.mod.name):
+            for current_first_word, previous_first_word in zip(current.mod.__name, previous.mod.__name):
                 # print(f'{previous.mod.name} {previous_first_word} та {current.mod.name} {current_first_word}')
 
                 if current_first_word != previous_first_word:
                     # print(f'{previous.mod.name} та {current.mod.name} моди не однієї групи')
                     break
                 elif (current_first_word == ' ') and (previous_first_word == ' '):
-                    QLabel(f'{previous.mod.name}------------------------------------------')
-                    print(f'{previous.mod.name} та {current.mod.name} моди однієї групи')
+                    QLabel(f'{previous.mod.__name}------------------------------------------')
+                    print(f'{previous.mod.__name} та {current.mod.__name} моди однієї групи')
                     break

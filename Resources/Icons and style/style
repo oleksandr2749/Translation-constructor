@@ -3,15 +3,17 @@ QWidget {
     color: lightGray;
 }
 
-QPushButton {
-    border: none;
-    background-color: transparent;
+QPushButton{
+    font: 16px;
+    background: #2e3236;
+    border: 1px solid gray;
+    border-radius: 5;
 }
 QPushButton:hover {
-    background-color: white;
+    border: 1px solid #05c1ff;
 }
 QPushButton:pressed {
-    background-color: red;
+    background: #364d82;
 }
 
 #ListModLabel{
@@ -37,4 +39,8 @@ QPushButton:pressed {
     font: bold 20px;
     color: black;
     background: yellow;
+}
+
+#ListModLabel{
+    font: 24px;
 }

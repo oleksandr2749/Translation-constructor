@@ -16,7 +16,8 @@ from PySide6.QtWidgets import (QMenuBar, QComboBox, QGridLayout, QWidget, QLabel
 from PySide6.QtCore import Qt, QPoint, QDir, QPropertyAnimation, QRect, QEasingCurve
 from PySide6.QtGui import QIcon, QAction
 
-import Main
+from configparser import ConfigParser
+
 from GUI.Widgets.Settings.Parameter import RadioButton
 
 
@@ -98,23 +99,25 @@ class PathInputLine(QWidget):
         layout.addWidget(self.input_line, 1, 0)
 
     def input_path(self):
-
+        config = ConfigParser()
+        config['Settings'] = {'export_path': 'NotSet'}
         if self.input_line.text() != '':
-            Main.config.set('Settings', 'export_path', self.input_line.text())
+            config.set('Settings', 'export_path', self.input_line.text())
         else:
-            Main.config.set('Settings', 'export_path', 'NotSet')
+            config.set('Settings', 'export_path', 'NotSet')
 
         try:
             with open('config.ini', 'w') as configfile:
-                Main.config.write(configfile)
+                config.write(configfile)
         except FileNotFoundError:
             print('Помилка обробки конфігураційного файла')
 
     def path_from_config(self):
+        config = ConfigParser()
         try:
             with open('config.ini', 'r') as configfile:
-                if Main.config.get('Settings', 'export_path') != 'NotSet':
-                    return Main.config.get('Settings', 'export_path')
+                if config.get('Settings', 'export_path') != 'NotSet':
+                    return config.get('Settings', 'export_path')
                 else:
                     return
 
@@ -277,7 +280,7 @@ class ExecutiveSettingWidget(QWidget):
         if self.check_important_parameter_callback and self.check_important_parameter_callback():
             self.hide()
         else:
-            print("Потрібно вибрати важливий параметр.")
+            print('Потрібно вибрати важливий параметр.')
 
     def animate_button(self):
         self.button.setStyleSheet('background-color: #912323; color: black; border: none;')
@@ -323,7 +326,7 @@ class MenuBar(QMenuBar):
         super().__init__(parent)
 
         self.setObjectName('MenuBar')
-        self.settings_menu = self.addMenu("Налаштування")
+        self.settings_menu = self.addMenu('Налаштування')
 
         self.localization_action = QAction(QIcon('GUI/Icons and style/language.svg'), 'Локалізація')
         self.settings_menu.addAction(self.localization_action)

@@ -16,12 +16,6 @@ from pathlib import Path
 import xml.etree.ElementTree as ET
 
 
-def read_xml(file):
-    tree = ET.parse(file)
-    root = tree.getroot()
-    return root
-
-
 def def_process(mod_data):
     root = ET.Element('LanguageData')
     file_type = None
@@ -52,81 +46,29 @@ def def_process(mod_data):
 def xml_file_write(data, path, name):
     tree = ET.ElementTree(data)
     if not path.exists():
-        path.mkdir()
+        path.mkdir(parents=True, exist_ok=True)
     tree.write(file_or_filename=path / name, encoding='utf-8', xml_declaration=True)
 
 
-def get_all_defxml_path(path_to_defdir):
-    defxml_path_list = list()
-    for element in path_to_defdir.iterdir():
-        if element.is_file():
-            defxml_path_list.append(element)
-        else:
-            defxml_path_list.extend(get_all_defxml_path(element))
-    return defxml_path_list
+# Функція виконання в режимі модулів
+def processing_modular_mode(source_mod, language, export_path, version):
+    export_path = Path(export_path)
+    language = language.capitalize()
 
+    (export_path / source_mod.about.find('name').text / 'Languages' / language).mkdir(parents=True, exist_ok=True)
 
-# Функція виконання
-def run(modification, export_path, mode=None):
-    logging.info('Розпочато обробку для %s', modification.get_attribute('Name'))
-    # Словник шляхів тек моду перекладу
-    mod_folder_paths = dict()
-    mod_folder_paths['root'] = export_path / modification.get_attribute('Name')
-    mod_folder_paths['languages'] = mod_folder_paths['root']/'Languages'
-    mod_folder_paths['ukrainian'] = mod_folder_paths['languages']/'Ukrainian'
-    mod_folder_paths['definjected'] = mod_folder_paths['ukrainian']/'DefInjected'
-    mod_folder_paths['keyed'] = mod_folder_paths['ukrainian']/'Keyed'
+    for element in Path(source_mod.root_path / version).glob('**/*.xml'):
+        cooked_defs, def_type = def_process(ET.parse(element).getroot())
+        if def_type is not None:
+            xml_file_write(data=cooked_defs,
+                           name=element.stem + '_' + source_mod.about.find('packageId').text + '.xml',
+                           path=export_path / source_mod.about.find('name').text / 'Languages' / language / 'DefInjected' / def_type)
 
-    folder_to_create = (mod_folder_paths['root'], mod_folder_paths['languages'], mod_folder_paths['ukrainian'])
-
-    # Створення базових тек моду перекладу
-    logging.info('Розпочато створення базових тек моду перекладу в %s', export_path)
-    for folder in folder_to_create:
-        try:
-            folder.mkdir()
-        except FileExistsError:
-            logging.warning('Тека %s вже існує', folder.name)
-        except Exception:
-            logging.error('Не вдалось створити теку %s', folder.name, exc_info=True)
-        else:
-            logging.info('Створено теку %s', folder.name)
-
-    # Процес отримання Defs
-    logging.info('Розпочато процес отримання Defs')
-    defs_to_find = (modification.get_attribute('RootPath')/'1.5/Defs', modification.get_attribute('RootPath')/'Defs')
-
-    found = False
-    for defs_fonder in defs_to_find:
-        if defs_fonder.exists():
-            found = True
-            defxml_path_list = get_all_defxml_path(path_to_defdir=defs_fonder)
-            mod_folder_paths['definjected'].mkdir(exist_ok=True)
-            for defxml in defxml_path_list:
-                print('\n', defxml.name)
-                def_data = read_xml(file=defxml)
-                def_process_data, file_type = def_process(mod_data=def_data)
-                print(def_process_data, file_type)
-
-                if def_process_data is None:
-                    continue
-                else:
-                    xml_file_write(data=def_process_data, path=mod_folder_paths['definjected'] / file_type,
-                                   name=defxml.name[0:-4] + '_' + modification.get_attribute('PackageId') + '.xml')
-    if found is True:
-        pass
-    if found is False:
-        logging.error('Не знайдено теку Defs. Викликано функцію сповіщення!')
-
-    # Процес отримання Keyed
-    if (modification.get_attribute('RootPath')/'Languages/English/Keyed').exists():
-        for file in Path(modification.get_attribute('RootPath')/'Languages/English/Keyed').iterdir():
-            data = read_xml(file)
-
-            root = ET.Element('LanguageData')
-            for element in data:
-                root.append(ET.Comment(element.text))
-                root.append(element)
-            ET.indent(root, level=0)
-
-            xml_file_write(data=root, path=mod_folder_paths['keyed'],
-                           name=file.name[0:-4] + '_' + modification.get_attribute('PackageId') + '.xml')
+    if (source_mod.root_path / 'Languages/English/Keyed').exists():
+        for keyed in Path(source_mod.root_path / 'Languages/English/Keyed').glob('**/*.xml'):
+            destination = export_path / source_mod.about.find('name').text / 'Languages' / language / 'Keyed' / keyed.name
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_bytes(keyed.read_bytes())
+            root = ET.parse(keyed).getroot()
+            for element in list(root):
+                root.insert(list(root).index(element), ET.Comment(element.text))

@@ -13,8 +13,8 @@
 
 from PySide6.QtWidgets import QMainWindow
 
-from GUI.Widgets.MenuBar import MenuBar
-from GUI.Widgets.MainWidget import MainWidget
+# from GUI.Widgets.MenuBar import MenuBar
+# from GUI.Widgets.MainWidget import MainWidget
 
 
 class MainWindow(QMainWindow):
@@ -25,8 +25,8 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('Конструктор перекладу 1.0.1')
         self.resize(800, 600)
 
-        self.main_widget = MainWidget()
-        self.setCentralWidget(self.main_widget)
+        # self.main_widget = MainWidget()
+        # self.setCentralWidget(self.main_widget)
 
-        self.menu_bar_widget = MenuBar()
-        self.setMenuBar(self.menu_bar_widget)
+        # self.menu_bar_widget = MenuBar()
+        # self.setMenuBar(self.menu_bar_widget)

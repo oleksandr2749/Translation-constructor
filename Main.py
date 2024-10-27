@@ -10,3 +10,14 @@
 #
 # You should have received a copy of the GNU General Public License along with Translation Constructor. If not,
 # see <https://www.gnu.org/licenses/>.
+import sys
+
+from PySide6.QtWidgets import QApplication
+
+from GUI.MainWindow import MainWindow
+
+app = QApplication(sys.argv)
+window = MainWindow()
+window.setStyleSheet('Resources/Icons and style/style')
+window.show()
+app.exec()

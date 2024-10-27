@@ -16,6 +16,12 @@ from pathlib import Path
 import xml.etree.ElementTree as ET
 
 
+def comment(element):
+    if type(element) is ET.Element:
+        for child in element:
+            print(element)
+
+
 def def_process(mod_data):
     root = ET.Element('LanguageData')
     file_type = None
